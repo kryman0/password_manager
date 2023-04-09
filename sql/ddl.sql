@@ -1,10 +1,15 @@
 -- setup tables
----------------
+-- ------------
+
+
+-- use database
+use password_manager;
+
 
 -- create users
 create table if not exists users (
     email varchar(128) not null unique primary key,
-    password varchar(512) not null,
+    password varchar(512) not null
 );
 
 
