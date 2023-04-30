@@ -1,0 +1,29 @@
+-- setup tables
+---------------
+
+-- turn on foreign key constraint
+PRAGMA foreign_keys = ON;
+
+begin transaction;
+
+-- drop tables
+drop table if exists passwords;
+drop table if exists users;
+
+-- create users
+create table if not exists users (
+    email text primary key,
+    password text not null
+);
+
+-- create passwords
+create table if not exists passwords (
+    title text not null,
+    username text,
+    password text,
+    url text,
+    description text,
+    user_email text references users(email)
+);
+
+end transaction;

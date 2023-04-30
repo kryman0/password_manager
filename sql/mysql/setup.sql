@@ -1,4 +1,4 @@
--- setup user and database
+-- setup user and database (mysql)
 -- -----------------------
 
 
