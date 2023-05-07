@@ -4,9 +4,14 @@ const path = require('node:path')
 const { db } = require('./modules/db/sqlite')
 
 
-if (!db.isDbInit()) db.setupDb() //check this for remote access
+if (!db.isDbInit()) db.initDb() //check this for remote access
 
 console.log(db.isDbInit())
+
+
+let user = { email: 'adam', password: 'test' }
+
+db.insertUser(user)
 
 //const createWindow = () => {
 //    const win = new BrowserWindow({

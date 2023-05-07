@@ -25,7 +25,7 @@ function setupDb() {
         
         db.exec(setupDbFile)
         
-        db.close()
+        //db.close()
 
     } catch (ex) {
         // add some logging
@@ -42,21 +42,37 @@ function isDbInit() {
 function runQuery(sql, params, crud) {
     db.run(sql, params, function (err) {
         if (err) {
-            dbTransactionError(err, crud)
-        }
-        else {
+            dbTransactionError(err, crud)         
+        } else {
             if (crud === crud.insert) logDbTransaction(crud, this.lastID)
             else if (crud === crud.update || crud === crud.delete) logDbTransaction(crud, this.changes)
         }
     })
 }
 
-function insertUser(user) {
-    const sql = 'insert into users (email, password) values ($username, $password)'
+function checkIfEntityExists(sql, entity) {
+    db.get(sql, function(err, row) {
+        // add some logging to first two conditions
+        if (err) {
+            throw new Error(`There was some error checking if ${entity} exists before inserting ${entity}`, err)
+        }
 
-    const params = { $username: user.username, $password: user.password }
+        if (row) {
+            throw new Error(`${entity} already exists`)
+        }
+    })
+}
+
+function insertUser(user) {
+    const sql = 'insert into users (email, password) values ($email, $password);'
+
+    const params = { $email: user.email, $password: user.password }
     
-    runQuery(sql, params, crud.insert)
+    const doesUserExistsSql = `select * from users where email = "${user.email}";`
+
+    checkIfEntityExists(doesUserExistsSql, user.email)
+
+    //runQuery(sql, params, crud.insert)
 }
 
 function insertPassword(passwd) {
@@ -72,7 +88,7 @@ function insertPassword(passwd) {
         $password,
         $url,
         $descr,
-        $user_email)`
+        $user_email);`
 
     const params = { $title: passwd.title, $username: passwd.username, $password: passwd.password,
         $url: passwd.url, $descr: passwd.description, $user_email: passwd.userEmail }
@@ -101,5 +117,7 @@ db.on('error', function(err) {
 exports.db = {
     initDb: setupDb,
     isDbInit: isDbInit,
+    insertUser: insertUser,
+    insertPassword: insertPassword
 }
 
