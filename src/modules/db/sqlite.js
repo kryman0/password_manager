@@ -39,22 +39,55 @@ function isDbInit() {
     return fs.existsSync(pathToDb)
 }
 
-function insertUser(user) {
-    const sql = 'insert into users (email, password) values($username, $password)'
-
-    db.run(sql, {$username: user.username, $password: user.password}, function (err) {
-        if (err) dbTransactionError(err, crud.insert)
-        else logSuccDbTransaction(crud.insert, this.lastID)
+function runQuery(sql, params, crud) {
+    db.run(sql, params, function (err) {
+        if (err) {
+            dbTransactionError(err, crud)
+        }
+        else {
+            if (crud === crud.insert) logDbTransaction(crud, this.lastID)
+            else if (crud === crud.update || crud === crud.delete) logDbTransaction(crud, this.changes)
+        }
     })
 }
 
+function insertUser(user) {
+    const sql = 'insert into users (email, password) values ($username, $password)'
+
+    const params = { $username: user.username, $password: user.password }
+    
+    runQuery(sql, params, crud.insert)
+}
+
+function insertPassword(passwd) {
+    const sql = `insert into passwords (
+        title,
+        username,
+        password,
+        url,
+        description,
+        user_email) values (
+        $title,
+        $username,
+        $password,
+        $url,
+        $descr,
+        $user_email)`
+
+    const params = { $title: passwd.title, $username: passwd.username, $password: passwd.password,
+        $url: passwd.url, $descr: passwd.description, $user_email: passwd.userEmail }
+
+    runQuery(sql, params, crud.insert)
+}
+
 function dbTransactionError(err, transactType) {
+    // add some logging
     console.log(`${transactType} error: ${err}`)
 }
 
-function logSuccDbTransaction(transactType, transactLog) {
+function logDbTransaction(transactType, transactLog) {
     // insert, update or delete
-    // add some logging
+    // add some logging    
     console.log(`${transactType} successful: ${transactLog}`)
 }
 
