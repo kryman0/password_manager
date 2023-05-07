@@ -1,18 +1,12 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('node:path')
-const EventEmitter = require('node:events')
-class MyEvent extends EventEmitter {}
-const myEv = new MyEvent()
-myEv.on('error', (err) => {
-    console.log("emitted some error:", err)
-})
 
-
-//const db = require('modules/db/sqlite')
 const { db } = require('./modules/db/sqlite')
 
-console.log(db.initDb)
-console.log(db.isDbInitialized)
+
+if (!db.isDbInit()) db.setupDb() //check this for remote access
+
+console.log(db.isDbInit())
 
 //const createWindow = () => {
 //    const win = new BrowserWindow({

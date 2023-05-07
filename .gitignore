@@ -1,4 +1,4 @@
-## begin nodejs
+## nodejs
 
 # Logs
 logs
@@ -131,4 +131,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-## end nodejs
+
+## misc
+
+sql/pm_db.sqlite
