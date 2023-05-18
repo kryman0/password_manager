@@ -2,7 +2,7 @@
 ---------------
 
 -- turn on foreign key constraint
-PRAGMA foreign_keys = ON;
+-- PRAGMA foreign_keys = ON;
 
 begin transaction;
 
@@ -23,7 +23,8 @@ create table if not exists passwords (
     password text,
     url text,
     description text,
-    user_email text references users(email)
+    user_email text not null,
+    foreign key(user_email) references users(email)
 );
 
 end transaction;

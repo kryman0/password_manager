@@ -16,6 +16,6 @@
     "electron": "^24.0.0"
   },
   "dependencies": {
-    "sqlite3": "^5.1.6"
+    "better-sqlite3": "^8.3.0"
   }
 }
