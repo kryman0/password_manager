@@ -23,6 +23,7 @@ function getCrudActionMsg(crudAction, entity, info=null) {
         insertUser: `Inserted user ${entity} on ${rowId}`,
         insertPwd:  `Inserted password ${entity} on ${rowId}`,
         errInsUser: `Error inserting user ${entity}`
+        errInsPwd = `error inserting password ${entity}`
     }
 
     switch (crudAction) {
@@ -32,6 +33,8 @@ function getCrudActionMsg(crudAction, entity, info=null) {
             return crudActionMsgs.insertPwd
         case 'error inserting user'
             return crudActionMsgs.errInsUser
+        case 'error inserting password'
+            return crudActionMsgs.errInsPwd
     }
 }
 
@@ -135,12 +138,15 @@ function insertUser(user) {
     //    dbTransactionError(ex, crud.insert)
     //}
 
-    runQuery(sql, params, crud.insert)
+    //runQuery(sql, params, crud.insert)
 
-    return getCrudActionMsg('insert user', user.email)
+    //return getCrudActionMsg('insert user', user.email)
 }
 
 function insertPassword(passwd) {
+    const logMsg = 'insert password'
+    const errorMsg = 'error inserting password'
+
     const sql = `insert into passwords (\
         title,\
         username,\
@@ -156,21 +162,30 @@ function insertPassword(passwd) {
         $user_email);`
 
     const params = { 
-        $title: passwd.title, 
-        $username: passwd.username, 
-        $password: passwd.password,
-        $url: passwd.url, 
-        $descr: passwd.description, 
-        $user_email: passwd.userEmail 
+        title: passwd.title, 
+        username: passwd.username, 
+        password: passwd.password,
+        url: passwd.url, 
+        descr: passwd.description, 
+        user_email: passwd.userEmail 
     }
     
     try {
-        runQuery(sql, params, crud.insert)
+        const insPwd = db.prepare(sql)
+        const info = insPwd.run(params)
+
+        logDbTransaction(getCrudActionMsg(logMsg, passwd.title, info))
     } catch (ex) {
-        dbTransactionError(err, crud.insert)
+        logDbTransaction(getCrudActionMsg(errorMsg, passwd.title), ex)
     }
 
-    return getCrudActionMsg('insert password', passwd.title)
+    //try {
+    //    runQuery(sql, params, crud.insert)
+    //} catch (ex) {
+    //    dbTransactionError(err, crud.insert)
+    //}
+
+    //return getCrudActionMsg('insert password', passwd.title)
 }
 
 //function dbTransactionError(transactType, err) {
