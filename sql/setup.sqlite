@@ -1,9 +1,6 @@
 -- setup tables
 ---------------
 
--- turn on foreign key constraint
--- PRAGMA foreign_keys = ON;
-
 begin transaction;
 
 -- drop tables
@@ -25,5 +22,11 @@ create table if not exists passwords (
     encryption text not null,
     foreign key(encryption) references encryptions(name)
 );
+
+-- insert encryptions
+insert into encryptions values('plain_text');
+insert into encryptions values('aes');
+insert into encryptions values('3des');
+insert into encryptions values('twofish');
 
 end transaction;

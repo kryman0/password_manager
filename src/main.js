@@ -8,8 +8,7 @@ console.log(db.isDbFileCreated())
 if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
 console.log(db.isDbFileCreated())
 
-
-const user = { email: 'user1@test.com', password: 'test' }
+db.restoreDb()
 
 const password = {
     title: 'test title',
@@ -17,55 +16,17 @@ const password = {
     password: 'pass1',
     url: 'https://www.account1.com',
     description: '',
-    userEmail: 'adam@test.com'
+    encryption: 'aes'
 }
 
 const getPasswdSql = 'select * from passwords where title = "test title";'
 const getAllPasswdsSql = 'select * from passwords;'
 
-//console.log(db.insertPassword(password))
+db.insPasswd(password)
 //console.log(db.getEntity(getPasswdSql, 'select one'))
 //db.getAllEntities(getAllPasswdsSql, [], 'select all')
 
 
-const sql = `insert into passwords (\
-    title,\
-    username,\
-    password,\
-    url,\
-    description,\
-    user_email) values (\
-    $title,\
-    $username,\
-    $password,\
-    $url,\
-    $descr,\
-    $user_email);`
-
-const params = { 
-    title: password.title, 
-    username: password.username, 
-    password: password.password,
-    url: password.url, 
-    descr: password.description, 
-    user_email: password.userEmail 
-}
-
-const insPwd = db.prepare(sql)
-console.log(insPwd.run(params))
-
-const sqlUsr = 'insert into users (email, password) values (?, ?);'
-const insUsr = db.prepare(sqlUsr)
-console.log(insUsr.run("adam@test.com", "pass1"))
-
-const selUsr = db.prepare('select * from users;')
-console.log(selUsr.all())
-
-//const insPwd = db.prepare(sql)
-//console.log(insPwd.run(params))
-
-const select = db.prepare(getAllPasswdsSql)
-console.log(select.all())
 
 //const createWindow = () => {
 //    const win = new BrowserWindow({

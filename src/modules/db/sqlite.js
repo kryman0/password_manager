@@ -3,9 +3,8 @@ const path = require('node:path')
 
 const Database = require('better-sqlite3')
 const pathToDb = path.resolve('sql/pm_db.sqlite')
-const dbOpts = { verbose: logDbTransaction }
-const db = new Database(pathToDb, dbOpts)
 
+var db = getNewDb()
 
 // close db when app closes, etc.
 
@@ -17,23 +16,22 @@ const crud = {
 }
 
 
+function getNewDb() {
+    const dbOpts = { verbose: logDbTransaction }
+
+    return new Database(pathToDb, dbOpts)
+}
+
 function getCrudActionMsg(crudAction, entity, info=null) {
     const crudActionMsgs = {
-        rowId:      `row id ${info.lastInsertRowid}`,
-        insertUser: `Inserted user ${entity} on ${rowId}`,
-        insertPwd:  `Inserted password ${entity} on ${rowId}`,
-        errInsUser: `Error inserting user ${entity}`
-        errInsPwd = `error inserting password ${entity}`
+        insertPwd:  `Inserted password ${entity} on row id ${info.lastInsertRowid}`,
+        errInsPwd:  `error inserting password ${entity}`
     }
 
     switch (crudAction) {
-        case 'insert user':
-            return crudActionMsgs.insertUser
         case 'insert password':
             return crudActionMsgs.insertPwd
-        case 'error inserting user'
-            return crudActionMsgs.errInsUser
-        case 'error inserting password'
+        case 'error inserting password':
             return crudActionMsgs.errInsPwd
     }
 }
@@ -61,6 +59,14 @@ function setupDbSchema() {
 
 function isDbFileCreated() {
     return fs.existsSync(pathToDb)
+}
+
+function restoreDb() {
+    if (isDbFileCreated()) {
+        setupDbSchema()
+    } else {
+        db = getNewDb()
+    }
 }
 
 function runQuery(sql, params, crud) {
@@ -112,37 +118,6 @@ function checkIfEntityExists(sql, entity) {
     })
 }
 
-function insertUser(user) {
-    const logMsg = 'insert user'
-    const errorMsg = 'error inserting user'
-
-    const sql = 'insert into users (email, password) values ($email, $password);'
-
-    const params = { email: user.email, password: user.password }
-    
-    try {
-        const insUser = db.prepare(sql)
-        const info = insUser.run(params)
-
-        logDbTransaction(getCrudActionMsg(logMsg, user.email, info))
-    } catch (ex) {
-        logDbTransaction(getCrudActionMsg(errorMsg, user.email), ex)
-    }
-
-
-    //const selectUserSql = `select * from users where email = "${user.email}";`
-
-    //try {
-    //    checkIfEntityExists(selectUserSql, user.email)
-    //} catch (ex) {
-    //    dbTransactionError(ex, crud.insert)
-    //}
-
-    //runQuery(sql, params, crud.insert)
-
-    //return getCrudActionMsg('insert user', user.email)
-}
-
 function insertPassword(passwd) {
     const logMsg = 'insert password'
     const errorMsg = 'error inserting password'
@@ -153,13 +128,13 @@ function insertPassword(passwd) {
         password,\
         url,\
         description,\
-        user_email) values (\
+        encryption) values (\
         $title,\
         $username,\
         $password,\
         $url,\
         $descr,\
-        $user_email);`
+        $encryption);`
 
     const params = { 
         title: passwd.title, 
@@ -167,7 +142,7 @@ function insertPassword(passwd) {
         password: passwd.password,
         url: passwd.url, 
         descr: passwd.description, 
-        user_email: passwd.userEmail 
+        encryption: passwd.encryption
     }
     
     try {
@@ -203,8 +178,8 @@ function logDbTransaction(transType='From database', transLog='') {
 exports.db = {
     setupDb: setupDbSchema,
     isDbFileCreated: isDbFileCreated,
-    //insertUser: insertUser,
-    //insertPassword: insertPassword,
+    restoreDb: restoreDb,
+    insPasswd: insertPassword,
     //getEntity: getEntity,
     //getAllEntities: getAllEntities
 }
