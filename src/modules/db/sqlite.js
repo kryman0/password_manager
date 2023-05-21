@@ -10,13 +10,6 @@ setupDbSchema()
 // close db when app closes, etc.
 
 
-const crud = {
-    insert: 'insert',
-    update: 'update',
-    delete: 'delete'
-}
-
-
 function getNewDb() {
     const dbOpts = { verbose: logDbTransaction }
 
@@ -25,20 +18,6 @@ function getNewDb() {
 
 function closeDb() {
     db.close()
-}
-
-function getCrudActionMsg(crudAction, entity, info=null) {
-    const crudActionMsgs = {
-        insertPwd:  `Inserted password ${entity} on row id ${info.lastInsertRowid}`,
-        errInsPwd:  `error inserting password ${entity}`,
-    }
-
-    switch (crudAction) {
-        case 'insert password':
-            return crudActionMsgs.insertPwd
-        case 'error inserting password':
-            return crudActionMsgs.errInsPwd
-    }
 }
 
 function setupDbSchema() {
@@ -69,20 +48,6 @@ function restoreDb() {
     
     db = getNewDb()
     setupDbSchema()
-}
-
-function runQuery(sql, params, crud) {
-    db.run(sql, params, function (err) {
-        console.log("from run query", err)
-        if (err) {
-            dbTransactionError(err, crud)         
-
-            throw err
-        } else {
-            if (crud === crud.insert) logDbTransaction(crud, this.lastID)
-            else if (crud === crud.update || crud === crud.delete) logDbTransaction(crud, this.changes)
-        }
-    })
 }
 
 function getAllEntities(entity) {
@@ -127,22 +92,19 @@ function checkIfEntityExists(sql, entity) {
 }
 
 function insertPassword(passwd) {
-    const logMsg = 'insert password'
-    const errorMsg = 'error inserting password'
-
     const sql = `insert into passwords (\
         title,\
         username,\
         password,\
         url,\
         description,\
-        encryption) values (\
+        enc_id) values (\
         $title,\
         $username,\
         $password,\
         $url,\
         $descr,\
-        $encryption);`
+        $encId);`
 
     const params = { 
         title: passwd.title, 
@@ -150,25 +112,21 @@ function insertPassword(passwd) {
         password: passwd.password,
         url: passwd.url, 
         descr: passwd.description, 
-        encryption: passwd.encryption
+        encId: passwd.encId
     }
     
     try {
         const insPwd = db.prepare(sql)
         const info = insPwd.run(params)
 
-        logDbTransaction(getCrudActionMsg(logMsg, passwd.title, info))
+        const logMsg = `inserted password ${passwd.title} on row id ${info.lastInsertRowid}`
+
+        logDbTransaction(logMsg)
     } catch (ex) {
-        logDbTransaction(getCrudActionMsg(errorMsg, passwd.title), ex)
+        const errorMsg = `error inserting password ${passwd.title}`
+
+        logDbTransaction(errorMsg, ex)
     }
-
-    //try {
-    //    runQuery(sql, params, crud.insert)
-    //} catch (ex) {
-    //    dbTransactionError(err, crud.insert)
-    //}
-
-    //return getCrudActionMsg('insert password', passwd.title)
 }
 
 //function dbTransactionError(transactType, err) {
@@ -187,7 +145,7 @@ exports.db = {
     getAll: getAllEntities,
     insPasswd: insertPassword,
     isDbFileCreated: isDbFileCreated,
-    restoreDb: restoreDb,
+    restore: restoreDb,
     setupDb: setupDbSchema,
 }
 

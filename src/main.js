@@ -15,7 +15,7 @@ const password = {
     password: 'pass1',
     url: 'https://www.account1.com',
     description: '',
-    encryption: 'aes'
+    encId: 2
 }
 
 const getPasswdSql = 'select * from passwords where title = "test title";'
@@ -23,6 +23,7 @@ const getPasswdSql = 'select * from passwords where title = "test title";'
 db.insPasswd(password)
 console.log(db.getAll('passwords'))
 //console.log(db.getEntity(getPasswdSql, 'select one'))
+db.restore()
 db.close()
 
 //const createWindow = () => {

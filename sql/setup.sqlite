@@ -9,24 +9,26 @@ drop table if exists encryptions;
 
 -- create encryptions
 create table if not exists encryptions (
-    name text primary key
+    id integer primary key autoincrement,
+    name text not null
 );
 
 -- create passwords
 create table if not exists passwords (
+    id integer primary key autoincrement,
     title text not null,
     username text,
     password text,
     url text,
     description text,
-    encryption text not null,
-    foreign key(encryption) references encryptions(name)
+    enc_id integer not null,
+    foreign key(enc_id) references encryptions(id)
 );
 
 -- insert encryptions
-insert into encryptions values('plain_text');
-insert into encryptions values('aes');
-insert into encryptions values('3des');
-insert into encryptions values('twofish');
+insert into encryptions values(1, 'plain_text');
+insert into encryptions values(2, 'aes');
+insert into encryptions values(3, 'twofish');
+insert into encryptions values(4, '3des');
 
 end transaction;
