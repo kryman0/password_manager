@@ -5,6 +5,7 @@ const Database = require('better-sqlite3')
 const pathToDb = path.resolve('sql/pm_db.sqlite')
 
 var db = getNewDb()
+setupDbSchema()
 
 // close db when app closes, etc.
 
@@ -22,10 +23,15 @@ function getNewDb() {
     return new Database(pathToDb, dbOpts)
 }
 
+function closeDb() {
+    db.close()
+}
+
 function getCrudActionMsg(crudAction, entity, info=null) {
     const crudActionMsgs = {
         insertPwd:  `Inserted password ${entity} on row id ${info.lastInsertRowid}`,
-        errInsPwd:  `error inserting password ${entity}`
+        errInsPwd:  `error inserting password ${entity}`,
+        errGetAllEnts: `error getting all ${entity}`
     }
 
     switch (crudAction) {
@@ -33,6 +39,8 @@ function getCrudActionMsg(crudAction, entity, info=null) {
             return crudActionMsgs.insertPwd
         case 'error inserting password':
             return crudActionMsgs.errInsPwd
+        case 'error getting all':
+            crudActionMsgs.errGetAllEnts
     }
 }
 
@@ -41,7 +49,6 @@ function setupDbSchema() {
         let setupDbFile = fs.readFileSync(path.resolve('sql/setup.sqlite'), 'utf8')
 
         if (typeof setupDbFile !== 'string' || setupDbFile.length === 0) {
-            // add some logging
             throw new Error("Could not read the sqlite setup file")
         }
         
@@ -50,10 +57,7 @@ function setupDbSchema() {
 
         db.exec(setupDbFile)
     } catch (ex) {
-        // add some logging
-        dbTransactionError(ex, "Could not execute the sqlite setup transaction")
-
-        throw ex
+        logDbTransaction(ex)
     }
 }
 
@@ -61,12 +65,13 @@ function isDbFileCreated() {
     return fs.existsSync(pathToDb)
 }
 
-function restoreDb() {
+function restoreDb() {    
     if (isDbFileCreated()) {
-        setupDbSchema()
-    } else {
-        db = getNewDb()
+        fs.rmSync(pathToDb)
     }
+    
+    db = getNewDb()
+    setupDbSchema()
 }
 
 function runQuery(sql, params, crud) {
@@ -83,20 +88,31 @@ function runQuery(sql, params, crud) {
     })
 }
 
-// Maybe use better query for larger sets. See each.
-function getAllEntities(sql, params, crud) {
-    db.all(sql, params, function (err, rows) {
-        if (err) {
-            dbTransactionError(err, crud)         
+function getAllEntities(entity) {
+    const logErrMsg = 'error getting all'
 
-            throw new Error(err)
-        }
-
-        console.log(rows)
-    })
+    const sql = `select * from ${entity};`
+    
+    try {
+        const selAllStmt = db.prepare(sql)
+        const rows = selAllStmt.all()
+    } catch (ex) {
+        logDbTransaction(getCrudActionMsg(logErrMsg, entity), ex)
+    }
 }
 
+// ej klar
 function getEntity(sql, params, crud) {
+    const logErrMsg = 'error getting all'
+
+    const sql = `select * from ${entity};`
+    
+    try {
+        const selAllStmt = db.prepare(sql)
+        const rows = selAllStmt.all()
+    } catch (ex) {
+        logDbTransaction(getCrudActionMsg(logErrMsg, entity), ex)
+    }
     db.get(sql, params, function (err, row) {
         if (err) {
             dbTransactionError(err, crud)
@@ -169,7 +185,6 @@ function insertPassword(passwd) {
 //}
 
 function logDbTransaction(transType='From database', transLog='') {
-    // insert, update or delete
     // add some logging
     console.log(`${transType} ${transLog}`)
 }
@@ -180,7 +195,7 @@ exports.db = {
     isDbFileCreated: isDbFileCreated,
     restoreDb: restoreDb,
     insPasswd: insertPassword,
-    //getEntity: getEntity,
+    close: closeDb,
     //getAllEntities: getAllEntities
 }
 

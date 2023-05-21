@@ -5,10 +5,9 @@ const fs = require('node:fs')
 const { db } = require('./modules/db/sqlite')
 
 console.log(db.isDbFileCreated())
-if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
-console.log(db.isDbFileCreated())
+//if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
+//console.log(db.isDbFileCreated())
 
-db.restoreDb()
 
 const password = {
     title: 'test title',
@@ -20,13 +19,11 @@ const password = {
 }
 
 const getPasswdSql = 'select * from passwords where title = "test title";'
-const getAllPasswdsSql = 'select * from passwords;'
 
 db.insPasswd(password)
 //console.log(db.getEntity(getPasswdSql, 'select one'))
 //db.getAllEntities(getAllPasswdsSql, [], 'select all')
-
-
+db.close()
 
 //const createWindow = () => {
 //    const win = new BrowserWindow({
