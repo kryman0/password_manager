@@ -21,8 +21,8 @@ const password = {
 const getPasswdSql = 'select * from passwords where title = "test title";'
 
 db.insPasswd(password)
+console.log(db.getAll('passwords'))
 //console.log(db.getEntity(getPasswdSql, 'select one'))
-//db.getAllEntities(getAllPasswdsSql, [], 'select all')
 db.close()
 
 //const createWindow = () => {

@@ -31,7 +31,6 @@ function getCrudActionMsg(crudAction, entity, info=null) {
     const crudActionMsgs = {
         insertPwd:  `Inserted password ${entity} on row id ${info.lastInsertRowid}`,
         errInsPwd:  `error inserting password ${entity}`,
-        errGetAllEnts: `error getting all ${entity}`
     }
 
     switch (crudAction) {
@@ -39,8 +38,6 @@ function getCrudActionMsg(crudAction, entity, info=null) {
             return crudActionMsgs.insertPwd
         case 'error inserting password':
             return crudActionMsgs.errInsPwd
-        case 'error getting all':
-            crudActionMsgs.errGetAllEnts
     }
 }
 
@@ -89,39 +86,34 @@ function runQuery(sql, params, crud) {
 }
 
 function getAllEntities(entity) {
-    const logErrMsg = 'error getting all'
-
     const sql = `select * from ${entity};`
     
     try {
         const selAllStmt = db.prepare(sql)
         const rows = selAllStmt.all()
+
+        return rows
     } catch (ex) {
-        logDbTransaction(getCrudActionMsg(logErrMsg, entity), ex)
+        const logErrMsg = `error getting all ${entity}`
+
+        logDbTransaction(logErrMsg, ex)
     }
 }
 
-// ej klar
-function getEntity(sql, params, crud) {
-    const logErrMsg = 'error getting all'
-
-    const sql = `select * from ${entity};`
+//ej klar - params kan innehålla ett objekt med olika värden kanske?
+function getEntity(entity, params) {
+    const sql = `select * from ${entity} where ;`
     
     try {
         const selAllStmt = db.prepare(sql)
         const rows = selAllStmt.all()
+
+        return rows
     } catch (ex) {
-        logDbTransaction(getCrudActionMsg(logErrMsg, entity), ex)
+        const logErrMsg = `error getting all ${entity}`
+
+        logDbTransaction(logErrMsg, ex)
     }
-    db.get(sql, params, function (err, row) {
-        if (err) {
-            dbTransactionError(err, crud)
-
-            throw new Error(err)
-        }
-
-        if (row === undefined || row) console.log(row)
-    })
 }
 
 function checkIfEntityExists(sql, entity) {
@@ -191,11 +183,11 @@ function logDbTransaction(transType='From database', transLog='') {
 
 
 exports.db = {
-    setupDb: setupDbSchema,
+    close: closeDb,
+    getAll: getAllEntities,
+    insPasswd: insertPassword,
     isDbFileCreated: isDbFileCreated,
     restoreDb: restoreDb,
-    insPasswd: insertPassword,
-    close: closeDb,
-    //getAllEntities: getAllEntities
+    setupDb: setupDbSchema,
 }
 
