@@ -54,8 +54,8 @@ function getAllEntities(entity) {
     const sql = `select * from ${entity};`
     
     try {
-        const selAllStmt = db.prepare(sql)
-        const rows = selAllStmt.all()
+        const stmt = db.prepare(sql)
+        const rows = stmt.all()
 
         return rows
     } catch (ex) {
@@ -65,30 +65,19 @@ function getAllEntities(entity) {
     }
 }
 
-//ej klar - params kan innehålla ett objekt med olika värden kanske?
-function getEntity(entity, params) {
-    const sql = `select * from ${entity} where ;`
+function getEntity(entity, id) {
+    const sql = `select * from ${entity} where id = ?;`
     
     try {
-        const selAllStmt = db.prepare(sql)
-        const rows = selAllStmt.all()
+        const stmt = db.prepare(sql)
+        const row = stmt.get(id)
 
-        return rows
+        return row
     } catch (ex) {
-        const logErrMsg = `error getting all ${entity}`
+        const logErrMsg = `error getting ${entity}`
 
         logDbTransaction(logErrMsg, ex)
     }
-}
-
-function checkIfEntityExists(sql, entity) {
-    db.get(sql, function(err, row) {
-        if (err) {
-            throw new Error(`There was some error checking if ${entity} exists before inserting ${entity}`, err)
-        } else if (row) {
-            throw new Error(`${entity} already exists`)
-        }
-    })
 }
 
 function insertPassword(passwd) {
@@ -143,6 +132,7 @@ function logDbTransaction(transType='From database', transLog='') {
 exports.db = {
     close: closeDb,
     getAll: getAllEntities,
+    getOne: getEntity,
     insPasswd: insertPassword,
     isDbFileCreated: isDbFileCreated,
     restore: restoreDb,

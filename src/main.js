@@ -4,9 +4,10 @@ const fs = require('node:fs')
 
 const { db } = require('./modules/db/sqlite')
 
+// setupDb should only be run if the file has not been created
+// need to change logic in the db module
 console.log(db.isDbFileCreated())
 //if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
-//console.log(db.isDbFileCreated())
 
 
 const password = {
@@ -21,9 +22,8 @@ const password = {
 const getPasswdSql = 'select * from passwords where title = "test title";'
 
 db.insPasswd(password)
+console.log(db.getOne('passwords', 1))
 console.log(db.getAll('passwords'))
-//console.log(db.getEntity(getPasswdSql, 'select one'))
-db.restore()
 db.close()
 
 //const createWindow = () => {
