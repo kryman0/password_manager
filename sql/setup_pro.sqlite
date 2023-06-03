@@ -9,7 +9,7 @@ drop table if exists encryptions;
 
 -- create encryptions
 create table if not exists encryptions (
-    id integer primary key autoincrement,
+    id integer primary key,
     name text not null
 );
 
