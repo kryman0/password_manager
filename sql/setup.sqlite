@@ -28,7 +28,5 @@ create table if not exists passwords (
 -- insert encryptions
 insert into encryptions values(1, 'plain_text');
 insert into encryptions values(2, 'aes');
-insert into encryptions values(3, 'twofish');
-insert into encryptions values(4, '3des');
 
 end transaction;
