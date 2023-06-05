@@ -87,13 +87,17 @@ function insertPassword(passwd) {
         password,\
         url,\
         description,\
-        enc_id) values (\
+        key,\
+        enc_id
+        ) values (\
         $title,\
         $username,\
         $password,\
         $url,\
         $descr,\
-        $encId);`
+        $key,\
+        $encId
+    );`
 
     const params = { 
         title: passwd.title, 
@@ -101,6 +105,7 @@ function insertPassword(passwd) {
         password: passwd.password,
         url: passwd.url, 
         descr: passwd.description, 
+        key: passwd.key,
         encId: passwd.encId
     }
     
@@ -117,11 +122,6 @@ function insertPassword(passwd) {
         logDbTransaction(errorMsg, ex)
     }
 }
-
-//function dbTransactionError(transactType, err) {
-//    // add some logging
-//    console.log(`${transactType} error: ${err}`)
-//}
 
 function logDbTransaction(transType='From database', transLog='') {
     // add some logging

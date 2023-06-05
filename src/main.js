@@ -9,6 +9,8 @@ const { db } = require('./modules/db/sqlite')
 console.log(db.isDbFileCreated())
 //if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
 
+// check restoring works, adding password w/wo key
+db.restore()
 
 const password = {
     title: 'test title',
