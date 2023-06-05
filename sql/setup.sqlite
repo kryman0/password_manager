@@ -6,11 +6,18 @@ begin transaction;
 -- drop tables
 drop table if exists passwords;
 drop table if exists encryptions;
+drop table if exists keys;
 
 -- create encryptions
 create table if not exists encryptions (
     id integer primary key,
     name text not null
+);
+
+-- create keys
+create table if not exists keys (
+    id integer primary key,
+    key text not null
 );
 
 -- create passwords
@@ -22,7 +29,9 @@ create table if not exists passwords (
     url text,
     description text,
     enc_id integer not null,
+    key_id integer default null,
     foreign key(enc_id) references encryptions(id)
+    foreign key(key_id) references keys(id)
 );
 
 -- insert encryptions
