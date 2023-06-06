@@ -9,7 +9,6 @@ const { db } = require('./modules/db/sqlite')
 console.log(db.isDbFileCreated())
 //if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
 
-// check restoring works, adding password w/wo key
 db.restore()
 
 const password = {
@@ -18,7 +17,8 @@ const password = {
     password: 'pass1',
     url: 'https://www.account1.com',
     description: '',
-    encId: 2
+    encId: 2,
+    key: "my super long key"
 }
 
 const getPasswdSql = 'select * from passwords where title = "test title";'

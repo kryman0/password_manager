@@ -16,6 +16,7 @@
     "electron": "^24.0.0"
   },
   "dependencies": {
+    "aes-js": "^3.1.2",
     "better-sqlite3": "^8.3.0"
   }
 }
