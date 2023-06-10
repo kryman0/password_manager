@@ -1,22 +1,51 @@
-const aes = require('aes')
+const aesjs = require('aes-js')
 
-const key;
+const { crypto } = require('node:crypto')
+
+// need to add more, see doc
+
+function getKey() {
+    return generateRandomKey()
+}
+
+function getRandomBuffer() {
+    return crypto.randomBytes(128)
+}
+
+function generateRandomKey() {
+    const randomBufferPassword = getRandomBuffer()
+    const randomBufferSalt = getRandomBuffer()
+
+    return crypto.scryptSync(randomBufferPassword, randomBufferSalt, 32)
+}
 
 function textToBytes(text) {
-    return aes.utils.utf8.toBytes(text)
+    return aesjs.utils.utf8.toBytes(text)
 }
 
-function getCounter(key) {
-    return new aes.ModeOfOperation.ctr(key)
+function getCounter(key='') {
+    return new aesjs.ModeOfOperation.ctr(key)
 }
 
-function getEncBytes(textBytes) {
-    getCounter(key).encrypt(textBytes)
+function getEncBytesToHex(encBytes) {
+    return aesjs.utils.hex.fromBytes(encBytes)
 }
 
-function getEncHex(passwd) {
-    const passwdBytes = textToBytes(passwd)
-    const aesCt
-    const aesCtrr
-    const encBytes = getEncBytes()
+function getEncPasswordToHex(passwd, key) {
+    const textBytes = textToBytes(passwd)
+
+    const aesjsCtr = getCounter(key)
+    
+    const encBytes = aesjsCtr.encrypt(textBytes)
+
+    return getEncBytesToHex(encBytes)
+}
+
+// not done yet with decryption
+function getEncBytesFromHex(hex) {
+    return aesjs.utils.hex.toBytes(hex)
+}
+
+function getDecrBytes(encBytes, key) {
+    const aesCtr = getCounter(key)
 }
