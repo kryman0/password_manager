@@ -15,14 +15,18 @@ db.restore()
 const key = aesjs.generateKey()
 console.log("key:", key)
 
+const passwd = aesjs.getEncPasswdToHex("my password", key)
+const decrPasswd = aesjs.getDecPasswdFromHex(passwd, key)
+console.log("enc", passwd, "decr", decrPasswd)
+
 const password = {
     title: 'test title',
     username: 'user1',
-    password: 'pass1',
+    password: passwd,
     url: 'https://www.account1.com',
     description: '',
     encId: 2,
-    key: key
+    key: null
 }
 
 const getPasswdSql = 'select * from passwords where title = "test title";'
