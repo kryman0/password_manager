@@ -1,6 +1,6 @@
 const aesjs = require('aes-js')
 
-const { crypto } = require('node:crypto')
+const { randomBytes, scryptSync } = require('node:crypto')
 
 // need to add more, see doc
 
@@ -9,43 +9,60 @@ function getKey() {
 }
 
 function getRandomBuffer() {
-    return crypto.randomBytes(128)
+    return randomBytes(128)
 }
 
 function generateRandomKey() {
     const randomBufferPassword = getRandomBuffer()
     const randomBufferSalt = getRandomBuffer()
 
-    return crypto.scryptSync(randomBufferPassword, randomBufferSalt, 32)
+    return scryptSync(randomBufferPassword, randomBufferSalt, 32)
 }
 
 function textToBytes(text) {
     return aesjs.utils.utf8.toBytes(text)
 }
 
-function getCounter(key='') {
+function getCounter(key) {
     return new aesjs.ModeOfOperation.ctr(key)
+}
+
+function getEncBytes(textBytes, key) {
+    const aesjsCtr = getCounter(key)
+    
+    return aesjsCtr.encrypt(textBytes)
 }
 
 function getEncBytesToHex(encBytes) {
     return aesjs.utils.hex.fromBytes(encBytes)
 }
 
-function getEncPasswordToHex(passwd, key) {
+function getEncPasswordToHex(passwd, key='') {
     const textBytes = textToBytes(passwd)
 
-    const aesjsCtr = getCounter(key)
-    
-    const encBytes = aesjsCtr.encrypt(textBytes)
+    const encBytes = getEncBytes(textBytes, key)
 
     return getEncBytesToHex(encBytes)
 }
 
-// not done yet with decryption
 function getEncBytesFromHex(hex) {
     return aesjs.utils.hex.toBytes(hex)
 }
 
 function getDecrBytes(encBytes, key) {
-    const aesCtr = getCounter(key)
+    const aesjsCtr = getCounter(key)
+    
+    return aesjsCtr.decrypt(encBytes)
+}
+
+function textFromBytes(decrBytes) {
+    return aesjs.utils.utf8.fromBytes(decrBytes)
+}
+
+function getDecPasswordFromHex(hex, key='') {
+    const encBytes = getEncBytesFromHex(hex)
+
+    const decrBytes = getDecrBytes(encBytes, key)
+
+    return textFromBytes(decrBytes)
 }
