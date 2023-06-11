@@ -1,7 +1,8 @@
 const { app, BrowserWindow } = require('electron')
-const path = require('node:path')
 const fs = require('node:fs')
+const path = require('node:path')
 
+const { aesjs } = require('./modules/encryption/aes')
 const { db } = require('./modules/db/sqlite')
 
 // setupDb should only be run if the file has not been created
@@ -11,6 +12,9 @@ console.log(db.isDbFileCreated())
 
 db.restore()
 
+const key = aesjs.generateKey()
+console.log("key:", key)
+
 const password = {
     title: 'test title',
     username: 'user1',
@@ -18,7 +22,7 @@ const password = {
     url: 'https://www.account1.com',
     description: '',
     encId: 2,
-    key: "my super long key"
+    key: key
 }
 
 const getPasswdSql = 'select * from passwords where title = "test title";'

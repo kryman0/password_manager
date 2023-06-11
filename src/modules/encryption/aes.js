@@ -2,11 +2,6 @@ const aesjs = require('aes-js')
 
 const { randomBytes, scryptSync } = require('node:crypto')
 
-// need to add more, see doc
-
-function getKey() {
-    return generateRandomKey()
-}
 
 function getRandomBuffer() {
     return randomBytes(128)
@@ -37,7 +32,9 @@ function getEncBytesToHex(encBytes) {
     return aesjs.utils.hex.fromBytes(encBytes)
 }
 
-function getEncPasswordToHex(passwd, key='') {
+function getEncPasswordToHex(passwd, userKey=null) {
+    const key = userKey === null ? generateRandomKey() : userKey
+
     const textBytes = textToBytes(passwd)
 
     const encBytes = getEncBytes(textBytes, key)
@@ -59,10 +56,18 @@ function textFromBytes(decrBytes) {
     return aesjs.utils.utf8.fromBytes(decrBytes)
 }
 
-function getDecPasswordFromHex(hex, key='') {
+function getDecPasswordFromHex(hex, key) {
     const encBytes = getEncBytesFromHex(hex)
 
     const decrBytes = getDecrBytes(encBytes, key)
 
     return textFromBytes(decrBytes)
 }
+
+
+exports.aesjs = {
+    generateKey: generateRandomKey,
+    getEncPasswdToHex: getEncPasswordToHex,
+    getDecPasswdFromHex: getDecPasswordFromHex
+}
+
