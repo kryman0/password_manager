@@ -122,6 +122,12 @@ function insertCategory(category) {
     return insertEntity(sql, category, entityTypes.category, category)
 }
 
+function insertPasswordCategory(passwordId, category) {
+    const sql = `insert into passwords_categories values (?, ?);`
+
+    insertEntity(sql, [passwordId, category], entityType, entityTitle)
+}
+
 function insertEntity(sql, params, entityType, entityTitle) {
     try {
         const stmt = db.prepare(sql)
@@ -149,7 +155,9 @@ exports.db = {
     close: closeDb,
     getAll: getAllEntities,
     getOne: getEntity,
-    insPasswd: insertPassword,
+    insCategory: insertCategory,
+    insPassword: insertPassword,
+    insPasswordCategory: insertPasswordCategory,
     isDbFileCreated: isDbFileCreated,
     restore: restoreDb,
     setupDb: setupDbSchema,

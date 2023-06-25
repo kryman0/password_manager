@@ -29,11 +29,17 @@ const password = {
     key: null
 }
 
+const category = 'google'
+
 const getPasswdSql = 'select * from passwords where title = "test title";'
 
-db.insPasswd(password)
+db.insPassword(password)
+db.insCategory(category)
+
 console.log(db.getOne('passwords', 1))
+
 console.log(db.getAll('passwords'))
+
 db.close()
 
 //const createWindow = () => {
