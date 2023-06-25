@@ -1,0 +1,34 @@
+-- setup the settings database
+------------------------------
+
+begin transaction;
+
+-- drop tables
+drop table if exists settings;
+drop table if exists remote_parameters;
+drop table if exists remote_headers;
+
+
+-- create settings
+create table if not exists settings (
+    remotely integer default 0 not null,
+    path_local_db text null,
+    path_remote_db text null
+);
+
+-- create remote_parameters
+create table if not exists remote_parameters (
+    id integer primary key autoincrement,
+    key text not null,
+    value text not null
+);
+
+
+-- create remote_headers
+create table if not exists remote_headers (
+    id integer primary key autoincrement,
+    key text not null,
+    value text not null
+);
+
+end transaction;

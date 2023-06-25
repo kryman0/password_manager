@@ -1,0 +1,49 @@
+-- setup the data database
+--------------------------
+
+begin transaction;
+
+-- drop tables
+drop table if exists passwords_categories;
+drop table if exists categories;
+drop table if exists passwords;
+drop table if exists encryptions;
+
+
+-- create passwords_categories
+create table if not exists passwords_categories (
+    password_id integer primary key,
+    category text not null,
+    foreign_key(password_id) references passwords(id),
+    foreign_key(category) references categories(category)
+);
+
+-- create categories
+create table if not exists categories (
+    category text unique on conflict ignore
+);
+
+-- create passwords
+create table if not exists passwords (
+    id integer primary key autoincrement,
+    title text not null,
+    username text,
+    password text,
+    url text,
+    description text,
+    key text default null,
+    enc_id integer not null,
+    foreign key(enc_id) references encryptions(id)
+);
+
+-- create encryptions
+create table if not exists encryptions (
+    id integer primary key,
+    encryption text not null
+);
+
+-- insert encryptions
+insert into encryptions values(1, 'plain_text');
+insert into encryptions values(2, 'aes');
+
+end transaction;

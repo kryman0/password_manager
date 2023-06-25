@@ -9,6 +9,10 @@ setupDbSchema()
 
 // close db when app closes, etc.
 
+const entityTypes = {
+    password: 'password',
+    category: 'category'
+}
 
 function getNewDb() {
     const dbOpts = { verbose: logDbTransaction }
@@ -109,15 +113,27 @@ function insertPassword(passwd) {
         encId: passwd.encId
     }
     
-    try {
-        const insPwd = db.prepare(sql)
-        const info = insPwd.run(params)
+    return insertEntity(sql, params, entityTypes.password, params.title) 
+}
 
-        const logMsg = `inserted password ${passwd.title} on row id ${info.lastInsertRowid}`
+function insertCategory(category) {
+    const sql = `insert into categories values (?);`
+    
+    return insertEntity(sql, category, entityTypes.category, category)
+}
+
+function insertEntity(sql, params, entityType, entityTitle) {
+    try {
+        const stmt = db.prepare(sql)
+        const info = stmt.run(params)
+
+        const logMsg = `inserted ${entityType} ${entityTitle} on row id ${info.lastInsertRowid}`
 
         logDbTransaction(logMsg)
+
+        return info.lastInsertRowid
     } catch (ex) {
-        const errorMsg = `error inserting password ${passwd.title}`
+        const errorMsg = `error inserting ${entityType} ${entityTitle}`
 
         logDbTransaction(errorMsg, ex)
     }
