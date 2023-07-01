@@ -2,44 +2,77 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const Database = require('better-sqlite3')
-const pathToDb = path.resolve('sql/pm_db.sqlite')
 
-var db = getNewDb()
-setupDbSchema()
+var db = (function() {
+    var settingsInstance, dataInstance
+
+    function getNewDb(pathToDb) {
+        const dbOpts = { verbose: logDbTransaction }
+        
+        return new Database(pathToDb, dbOpts)
+    }
+
+    function setupDbSchema(pathToSchema, instance) {
+        try {
+            let setupDbFile = fs.readFileSync(pathToSchema, 'utf8')
+
+            if (typeof setupDbFile !== 'string' || setupDbFile.length === 0) {
+                throw new Error("Could not read the sqlite setup file")
+            }
+            
+            if (pathToSchema === paths.dataDb) {
+                instance.pragma('foreign_keys = ON')
+            }
+
+            instance.pragma('journal_mode = WAL')
+
+            instance.exec(setupDbFile)
+        } catch (ex) {
+            logDbTransaction(ex)
+        }
+    }
+
+    return {
+        getSettingsDb: function() {
+            if (!settingsInstance) {
+                settingsInstance = getNewDb(paths.settingsDb)
+
+                setupDbSchema(paths.schemaSettingsDb, settingsInstance)
+            }
+
+            return settingsInstance
+        },
+        getDataDb: function() {
+            if (!dataInstance) {
+                dataInstance = getNewDb(paths.dataDb)
+
+                setupDbSchema(paths.schemaDataDb, dataInstance)
+            }
+
+            return dataInstance
+        }
+    }
+})()
 
 // close db when app closes, etc.
 
+const paths = {
+    schemaSettingsDb:   path.resolve('sql/setup_settings.sqlite'),
+    schemaDataDb:       path.resolve('sql/setup_data.sqlite'),
+    settingsDb:         path.resolve('sql/pm_settings_db.sqlite'),
+    dataDb:             path.resolve('sql/pm_data_db.sqlite'),
+}
+
 const entityTypes = {
     password: 'password',
-    category: 'category'
+    category: 'category',
 }
 
-function getNewDb() {
-    const dbOpts = { verbose: logDbTransaction }
-
-    return new Database(pathToDb, dbOpts)
-}
 
 function closeDb() {
     db.close()
 }
 
-function setupDbSchema() {
-    try {
-        let setupDbFile = fs.readFileSync(path.resolve('sql/setup.sqlite'), 'utf8')
-
-        if (typeof setupDbFile !== 'string' || setupDbFile.length === 0) {
-            throw new Error("Could not read the sqlite setup file")
-        }
-        
-        db.pragma('journal_mode = WAL')
-        db.pragma('foreign_keys = ON')
-
-        db.exec(setupDbFile)
-    } catch (ex) {
-        logDbTransaction(ex)
-    }
-}
 
 function isDbFileCreated() {
     return fs.existsSync(pathToDb)
