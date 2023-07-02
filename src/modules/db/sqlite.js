@@ -1,9 +1,10 @@
 const fs = require('node:fs')
 const path = require('node:path')
 
-const Database = require('better-sqlite3')
+const { logDbTransaction } = require(path.resolve('src/modules/logging/db_logging'))
 
-var db = (function() {
+
+const db = (function() {
     var settingsInstance, dataInstance
 
     function getNewDb(pathToDb) {
@@ -56,12 +57,6 @@ var db = (function() {
 
 // close db when app closes, etc.
 
-const paths = {
-    schemaSettingsDb:   path.resolve('sql/setup_settings.sqlite'),
-    schemaDataDb:       path.resolve('sql/setup_data.sqlite'),
-    settingsDb:         path.resolve('sql/pm_settings_db.sqlite'),
-    dataDb:             path.resolve('sql/pm_data_db.sqlite'),
-}
 
 const entityTypes = {
     password: 'password',
@@ -87,7 +82,7 @@ function restoreDb() {
     setupDbSchema()
 }
 
-function getAllEntities(entity) {
+function getAllEntities(db, entity) {
     const sql = `select * from ${entity};`
     
     try {
@@ -102,7 +97,7 @@ function getAllEntities(entity) {
     }
 }
 
-function getEntity(entity, id) {
+function getEntity(db, entity, id) {
     const sql = `select * from ${entity} where id = ?;`
     
     try {
@@ -117,7 +112,7 @@ function getEntity(entity, id) {
     }
 }
 
-function insertPassword(passwd) {
+function insertPassword(db, passwd) {
     const sql = `insert into passwords (\
         title,\
         username,\
@@ -146,22 +141,22 @@ function insertPassword(passwd) {
         encId: passwd.encId
     }
     
-    return insertEntity(sql, params, entityTypes.password, params.title) 
+    return insertEntity(db, sql, params, entityTypes.password, params.title) 
 }
 
-function insertCategory(category) {
+function insertCategory(db, category) {
     const sql = `insert into categories values (?);`
     
-    return insertEntity(sql, category, entityTypes.category, category)
+    return insertEntity(db, sql, category, entityTypes.category, category)
 }
 
-function insertPasswordCategory(passwordId, category) {
+function insertPasswordCategory(db, passwordId, category) {
     const sql = `insert into passwords_categories values (?, ?);`
 
-    insertEntity(sql, [passwordId, category], entityType, entityTitle)
+    insertEntity(db, sql, [passwordId, category], entityType, entityTitle)
 }
 
-function insertEntity(sql, params, entityType, entityTitle) {
+function insertEntity(db, sql, params, entityType, entityTitle) {
     try {
         const stmt = db.prepare(sql)
         const info = stmt.run(params)
@@ -178,14 +173,11 @@ function insertEntity(sql, params, entityType, entityTitle) {
     }
 }
 
-function logDbTransaction(transType='From database', transLog='') {
-    // add some logging
-    console.log(`${transType} ${transLog}`)
-}
 
 
 exports.db = {
     close: closeDb,
+    db: db,
     getAll: getAllEntities,
     getOne: getEntity,
     insCategory: insertCategory,
@@ -193,6 +185,5 @@ exports.db = {
     insPasswordCategory: insertPasswordCategory,
     isDbFileCreated: isDbFileCreated,
     restore: restoreDb,
-    setupDb: setupDbSchema,
 }
 
