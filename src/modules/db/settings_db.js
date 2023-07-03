@@ -1,44 +1,30 @@
-const Database = require('better-sqlite3')
 const path = require('node:path')
-const paths = require(path.resolve('src/modules/constants/const_db'))
 
+const Database = require('better-sqlite3')
+
+const { logDbTransaction } = require(path.resolve('src/modules/logging/db_logging'))
+const paths = require(path.resolve('src/modules/constants/const_db'))
+const { getOrCreateDb, isDbCreated, setupDbSchema } = require(path.resolve('src/modules/db/sqlite'))
 
 const settingsDB = (function() {
-    var instance;
+    console.log('how many times have I been called?')
 
-    function getNewDb() {
-        const dbOpts = { verbose: logDbTransaction }
-        
-        return new Database(paths.settingsDB, dbOpts)
-    }
-
-    function setupDbSchema() {
-        try {
-            let setupDbFile = fs.readFileSync(paths.schemaSettingsDB, 'utf8')
-
-            if (typeof setupDbFile !== 'string' || setupDbFile.length === 0) {
-                throw new Error("Could not read the sqlite setup file")
-            }
-            
-            instance.pragma('journal_mode = WAL')
-
-            instance.exec(setupDbFile)
-        } catch (ex) {
-            logDbTransaction(ex)
-        }
-    }
+    var instance = isDbCreated(paths.settingsDB)
 
     return {
         getDb: function() {
             if (!instance) {
-                instance = getNewDb()
+                instance = getOrCreateDb(paths.settingsDB)
 
-                setupDbSchema()
+                setupDbSchema(paths.schemaSettingsDB, instance)
+            } else {
+                instance = getOrCreateDb(paths.settingsDB)
             }
 
             return instance
         }
+    }
 })()
 
 
-exports.db = settingsDB
+exports.settingsDB = settingsDB

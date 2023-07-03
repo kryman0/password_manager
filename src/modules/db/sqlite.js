@@ -1,59 +1,60 @@
 const fs = require('node:fs')
 const path = require('node:path')
 
-const { logDbTransaction } = require(path.resolve('src/modules/logging/db_logging'))
+const Database = require('better-sqlite3')
+const { logging } = require(path.resolve('src/modules/logging/db_logging'))
+const paths = require(path.resolve('src/modules/constants/const_db'))
 
-
-const db = (function() {
-    var settingsInstance, dataInstance
-
-    function getNewDb(pathToDb) {
-        const dbOpts = { verbose: logDbTransaction }
-        
-        return new Database(pathToDb, dbOpts)
-    }
-
-    function setupDbSchema(pathToSchema, instance) {
-        try {
-            let setupDbFile = fs.readFileSync(pathToSchema, 'utf8')
-
-            if (typeof setupDbFile !== 'string' || setupDbFile.length === 0) {
-                throw new Error("Could not read the sqlite setup file")
-            }
-            
-            if (pathToSchema === paths.dataDb) {
-                instance.pragma('foreign_keys = ON')
-            }
-
-            instance.pragma('journal_mode = WAL')
-
-            instance.exec(setupDbFile)
-        } catch (ex) {
-            logDbTransaction(ex)
-        }
-    }
-
-    return {
-        getSettingsDb: function() {
-            if (!settingsInstance) {
-                settingsInstance = getNewDb(paths.settingsDb)
-
-                setupDbSchema(paths.schemaSettingsDb, settingsInstance)
-            }
-
-            return settingsInstance
-        },
-        getDataDb: function() {
-            if (!dataInstance) {
-                dataInstance = getNewDb(paths.dataDb)
-
-                setupDbSchema(paths.schemaDataDb, dataInstance)
-            }
-
-            return dataInstance
-        }
-    }
-})()
+//const db = (function() {
+//    var settingsInstance, dataInstance
+//
+//    function getNewDb(pathToDb) {
+//        const dbOpts = { verbose: logging.logDbTransaction }
+//        
+//        return new Database(pathToDb, dbOpts)
+//    }
+//
+//    function setupDbSchema(pathToSchema, instance) {
+//        try {
+//            let setupDbFile = fs.readFileSync(pathToSchema, 'utf8')
+//
+//            if (typeof setupDbFile !== 'string' || setupDbFile.length === 0) {
+//                throw new Error("Could not read the sqlite setup file")
+//            }
+//            
+//            if (pathToSchema === paths.dataDb) {
+//                instance.pragma('foreign_keys = ON')
+//            }
+//
+//            instance.pragma('journal_mode = WAL')
+//
+//            instance.exec(setupDbFile)
+//        } catch (ex) {
+//            logging.logDbTransaction(ex)
+//        }
+//    }
+//
+//    return {
+//        getSettingsDb: function() {
+//            if (!settingsInstance) {
+//                settingsInstance = getNewDb(paths.settingsDb)
+//
+//                setupDbSchema(paths.schemaSettingsDb, settingsInstance)
+//            }
+//
+//            return settingsInstance
+//        },
+//        getDataDb: function() {
+//            if (!dataInstance) {
+//                dataInstance = getNewDb(paths.dataDb)
+//
+//                setupDbSchema(paths.schemaDataDb, dataInstance)
+//            }
+//
+//            return dataInstance
+//        }
+//    }
+//})()
 
 // close db when app closes, etc.
 
@@ -64,12 +65,38 @@ const entityTypes = {
 }
 
 
-function closeDb() {
+function closeDb(db) {
     db.close()
 }
 
 
-function isDbFileCreated() {
+exports.getOrCreateDb = function getOrCreateDb(pathToDb) {
+    const dbOpts = { verbose: logging.logDbTransaction }
+    
+    return new Database(pathToDb, dbOpts)
+}
+
+exports.setupDbSchema = function setupDbSchema(pathToSchema, instance) {
+    try {
+        let setupDbFile = fs.readFileSync(pathToSchema, 'utf8')
+
+        if (typeof setupDbFile !== 'string' || setupDbFile.length === 0) {
+            throw new Error("Could not read the sqlite setup file")
+        }
+        
+        if (pathToSchema === paths.dataDb) {
+            instance.pragma('foreign_keys = ON')
+        }
+
+        instance.pragma('journal_mode = WAL')
+
+        instance.exec(setupDbFile)
+    } catch (ex) {
+        logging.logDbTransaction(ex)
+    }
+}
+
+exports.isDbCreated = function isDbFileCreated(pathToDb) {
     return fs.existsSync(pathToDb)
 }
 
@@ -93,7 +120,7 @@ function getAllEntities(db, entity) {
     } catch (ex) {
         const logErrMsg = `error getting all ${entity}`
 
-        logDbTransaction(logErrMsg, ex)
+        logging.logDbTransaction(logErrMsg, ex)
     }
 }
 
@@ -108,7 +135,7 @@ function getEntity(db, entity, id) {
     } catch (ex) {
         const logErrMsg = `error getting ${entity}`
 
-        logDbTransaction(logErrMsg, ex)
+        logging.logDbTransaction(logErrMsg, ex)
     }
 }
 
@@ -163,13 +190,13 @@ function insertEntity(db, sql, params, entityType, entityTitle) {
 
         const logMsg = `inserted ${entityType} ${entityTitle} on row id ${info.lastInsertRowid}`
 
-        logDbTransaction(logMsg)
+        logging.logDbTransaction(logMsg)
 
         return info.lastInsertRowid
     } catch (ex) {
         const errorMsg = `error inserting ${entityType} ${entityTitle}`
 
-        logDbTransaction(errorMsg, ex)
+        logging.logDbTransaction(errorMsg, ex)
     }
 }
 
@@ -177,13 +204,11 @@ function insertEntity(db, sql, params, entityType, entityTitle) {
 
 exports.db = {
     close: closeDb,
-    db: db,
     getAll: getAllEntities,
     getOne: getEntity,
     insCategory: insertCategory,
     insPassword: insertPassword,
     insPasswordCategory: insertPasswordCategory,
-    isDbFileCreated: isDbFileCreated,
     restore: restoreDb,
 }
 
