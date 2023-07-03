@@ -2,9 +2,10 @@ const path = require('node:path')
 
 const Database = require('better-sqlite3')
 
+const { paths } = require(path.resolve('src/modules/constants/const_db'))
+const { getOrCreateDb, isDbCreated, setupDbSchema } = require(path.resolve('src/modules/db/db_helper'))
 const { logDbTransaction } = require(path.resolve('src/modules/logging/db_logging'))
-const paths = require(path.resolve('src/modules/constants/const_db'))
-const { getOrCreateDb, isDbCreated, setupDbSchema } = require(path.resolve('src/modules/db/sqlite'))
+
 
 const settingsDB = (function() {
     console.log('how many times have I been called?')

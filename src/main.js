@@ -1,11 +1,15 @@
-const { app, BrowserWindow } = require('electron')
 const fs = require('node:fs')
 const path = require('node:path')
 
-const { aesjs } = require(path.resolve('src/modules/encryption/aes'))
-const { db } = require(path.resolve('src/modules/db/sqlite'))
+const { app, BrowserWindow } = require('electron')
+
+const { dbHelper } = require(path.resolve('src/modules/db/db_helper'))
 const { settingsDB } = require(path.resolve('src/modules/db/settings_db'))
-console.log('from settingsdb', settingsDB.getDb())
+const { aesjs } = require(path.resolve('src/modules/encryption/aes'))
+//console.log('from settingsdb', settingsDB.getDb())
+
+const settingsDb = settingsDB.getDb()
+console.log(settingsDb)
 // setupDb should only be run if the file has not been created
 // need to change logic in the db module
 //console.log(db.isDbFileCreated())
@@ -42,7 +46,7 @@ const getPasswdSql = 'select * from passwords where title = "test title";'
 //
 //console.log(db.getAll('passwords'))
 //
-//db.close()
+dbHelper.close(settingsDb)
 
 //const createWindow = () => {
 //    const win = new BrowserWindow({
