@@ -3,7 +3,7 @@ const path = require('node:path')
 
 const Database = require('better-sqlite3')
 
-const { paths } = require(path.resolve('src/modules/constants/const_db'))
+const { paths } = require(path.resolve('src/modules/constants/paths'))
 const { logging } = require(path.resolve('src/modules/logging/db_logging'))
 
 
@@ -16,9 +16,11 @@ const entityTypes = {
 }
 
 
-function closeDb(db) {
+function closeDb(dbs) {
     console.log("from closedb", db)
-    db.close()
+    for (let i = 0; i < dbs.length; i++) {
+        dbs[i].close()
+    }
     console.log("from closedb", db)
 }
 
@@ -37,7 +39,7 @@ exports.setupDbSchema = function setupDbSchema(pathToSchema, instance) {
             throw new Error("Could not read the sqlite setup file")
         }
         
-        if (pathToSchema === paths.dataDb) {
+        if (pathToSchema === paths.db.dataDb) {
             instance.pragma('foreign_keys = ON')
         }
 

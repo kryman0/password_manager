@@ -10,9 +10,6 @@ const { aesjs } = require(path.resolve('src/modules/encryption/aes'))
 
 const settingsDb = settingsDB.getDb()
 console.log(settingsDb)
-// setupDb should only be run if the file has not been created
-// need to change logic in the db module
-//console.log(db.isDbFileCreated())
 //if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
 
 //db.restore()
