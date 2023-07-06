@@ -13,21 +13,20 @@ drop table if exists remote_headers;
 create table if not exists settings (
     remotely integer default 0 not null,
     path_local_db text null,
-    path_remote_db text null
+    path_remote_db text null,
+    remote_http_method text default GET
 );
 
 -- create remote_parameters
 create table if not exists remote_parameters (
-    id integer primary key autoincrement,
-    key text not null,
+    key text unique on conflict ignore,
     value text not null
 );
 
 
 -- create remote_headers
 create table if not exists remote_headers (
-    id integer primary key autoincrement,
-    key text not null,
+    key text unique on conflict ignore,
     value text not null
 );
 

@@ -3,25 +3,18 @@ const path = require('node:path')
 
 const Database = require('better-sqlite3')
 
+const { miscConstants } = require(path.resolve('src/modules/constants/misc'))
 const { paths } = require(path.resolve('src/modules/constants/paths'))
 const { logging } = require(path.resolve('src/modules/logging/db_logging'))
 
-
 // close db when app closes, etc.
 
-
-const entityTypes = {
-    password: 'password',
-    category: 'category',
-}
-
-
 function closeDb(dbs) {
-    console.log("from closedb", db)
+    console.log("from closedb", dbs)
     for (let i = 0; i < dbs.length; i++) {
         dbs[i].close()
     }
-    console.log("from closedb", db)
+    console.log("from closedb", dbs)
 }
 
 
@@ -138,10 +131,33 @@ function insertPasswordCategory(db, passwordId, category) {
     insertEntity(db, sql, [passwordId, category], entityType, entityTitle)
 }
 
-function insertEntity(db, sql, params, entityType, entityTitle) {
+function insertRemoteParameters(db, parameters) {
+    const sql = `insert into remote_parameters (\
+        key,\
+        value) values (\
+        $key,\
+        $value
+    );`
+    
+    insertEntity(db, sql, parameters, miscConstants.entityTypes.remoteParams, parameters.key)
+}
+
+function insertRemoteHeaders(db, headers) {
+    const sql = `insert into remote_headers (\
+        key,\
+        value) values (\
+        $key,\
+        $value
+    );`
+    
+    insertEntity(db, sql, parameters, miscConstants.entityTypes.remoteHeaders, parameters.key)
+}
+
+function insertEntity(db, sql, params, entityType='', entityTitle='') {
     try {
         const stmt = db.prepare(sql)
         const info = stmt.run(params)
+        console.log(info)
 
         const logMsg = `inserted ${entityType} ${entityTitle} on row id ${info.lastInsertRowid}`
 
@@ -163,6 +179,7 @@ exports.dbHelper = {
     insCategory: insertCategory,
     insPassword: insertPassword,
     insPasswordCategory: insertPasswordCategory,
+    insRemoteParams: insertRemoteParameters,
     restore: restoreDb,
 }
 

@@ -3,24 +3,26 @@ const path = require('node:path')
 
 const { app, BrowserWindow } = require('electron')
 
+const { miscConstants } = require(path.resolve('src/modules/constants/misc'))
+const { paths } = require(path.resolve('src/modules/constants/paths'))
 const { dbHelper } = require(path.resolve('src/modules/db/db_helper'))
-const { settingsDB } = require(path.resolve('src/modules/db/settings_db'))
 const { aesjs } = require(path.resolve('src/modules/encryption/aes'))
-//console.log('from settingsdb', settingsDB.getDb())
+const { fsHelper } = require(path.resolve('src/modules/helpers/fs'))
 
-const settingsDb = settingsDB.getDb()
-console.log(settingsDb)
+fsHelper.createFolderIfNonExisting(path.join(paths.folders.userHome, paths.folders.appFolder))
+
+const { settingsDB } = require(path.resolve('src/modules/db/settings_db'))
+
+
+const settiDb = settingsDB.getDb()
 //if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
 
 //db.restore()
 
-
 const key = aesjs.generateKey()
-console.log("key:", key)
 
 const passwd = aesjs.getEncPasswdToHex("my password", key)
 const decrPasswd = aesjs.getDecPasswdFromHex(passwd, key)
-console.log("enc", passwd, "decr", decrPasswd)
 
 const password = {
     title: 'test title',
@@ -36,6 +38,10 @@ const category = 'google'
 
 const getPasswdSql = 'select * from passwords where title = "test title";'
 
+const remoteParams = { key: 'myKey', value: 'myValue' }
+dbHelper.insRemoteParams(settiDb, remoteParams)
+console.log(dbHelper.getAll(settiDb, miscConstants.entityTypes.remoteParams))
+
 //db.insPassword(password)
 //db.insCategory(category)
 //
@@ -43,7 +49,7 @@ const getPasswdSql = 'select * from passwords where title = "test title";'
 //
 //console.log(db.getAll('passwords'))
 //
-dbHelper.close(settingsDb)
+dbHelper.close([settiDb])
 
 //const createWindow = () => {
 //    const win = new BrowserWindow({

@@ -1,9 +1,9 @@
 const fs = require('node:fs')
-const path = require('node:path')
 
 
-function createFolderIfNoneExisting(path) {
+function createFolderIfNonExisting(path) {
     if (!fs.existsSync(path)) {
+        console.log(path)
         try {
             fs.mkdirSync(path)
         } catch (ex) {
@@ -14,6 +14,6 @@ function createFolderIfNoneExisting(path) {
 
 
 exports.fsHelper = {
-    createFolderIfNoneExisting: createFolderIfNoneExisting,
+    createFolderIfNonExisting: createFolderIfNonExisting,
 }
 
