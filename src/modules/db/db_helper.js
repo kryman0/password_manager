@@ -48,15 +48,6 @@ exports.isDbCreated = function isDbFileCreated(pathToDb) {
     return fs.existsSync(pathToDb)
 }
 
-function restoreDb() {    
-    if (isDbFileCreated()) {
-        fs.rmSync(pathToDb)
-    }
-    
-    db = getNewDb()
-    setupDbSchema()
-}
-
 function getAllEntities(db, entity) {
     const sql = `select * from ${entity};`
     
@@ -150,7 +141,7 @@ function insertRemoteHeaders(db, headers) {
         $value
     );`
     
-    insertEntity(db, sql, parameters, miscConstants.entityTypes.remoteHeaders, parameters.key)
+    insertEntity(db, sql, headers, miscConstants.entityTypes.remoteHeaders, headers.key)
 }
 
 function insertEntity(db, sql, params, entityType='', entityTitle='') {
@@ -179,6 +170,7 @@ exports.dbHelper = {
     insCategory: insertCategory,
     insPassword: insertPassword,
     insPasswordCategory: insertPasswordCategory,
+    insRemoteHeaders: insertRemoteHeaders,
     insRemoteParams: insertRemoteParameters,
     restore: restoreDb,
 }

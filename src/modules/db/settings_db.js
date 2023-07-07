@@ -1,5 +1,3 @@
-const fs = require('node:fs')
-const os = require('node:os')
 const path = require('node:path')
 
 const Database = require('better-sqlite3')
@@ -10,8 +8,6 @@ const { logging } = require(path.resolve('src/modules/logging/db_logging'))
 
 
 const settingsDB = (function() {
-    console.log('how many times have I been called?', paths.db.settingsDB)
-
     let instance = isDbCreated(paths.db.settingsDB)
 
     return {
@@ -32,7 +28,6 @@ const settingsDB = (function() {
 })()
 
 function insertDefaultLocalPathToDB(db) {
-    console.log(paths.db.settingsDB)
     const sql = `insert into settings (path_local_db) values ('${paths.db.settingsDB.toString()}');`
 
     try {

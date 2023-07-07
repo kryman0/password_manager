@@ -39,8 +39,12 @@ const category = 'google'
 const getPasswdSql = 'select * from passwords where title = "test title";'
 
 const remoteParams = { key: 'myKey', value: 'myValue' }
+const remoteHeaders = { key: 'myHeaderType', value: 'myHeaderValue' }
+
 dbHelper.insRemoteParams(settiDb, remoteParams)
+dbHelper.insRemoteHeaders(settiDb, remoteHeaders)
 console.log(dbHelper.getAll(settiDb, miscConstants.entityTypes.remoteParams))
+console.log(dbHelper.getAll(settiDb, miscConstants.entityTypes.remoteHeaders))
 
 //db.insPassword(password)
 //db.insCategory(category)
