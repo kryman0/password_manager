@@ -18,7 +18,6 @@ const { settingsDB } = require(path.resolve('src/modules/db/settings_db'))
 const dataDb = dataDB.getDb()
 const settingsDb = settingsDB.getDb()
 //if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
-console.log(dataDb, settingsDb)
 
 const key = aesjs.generateKey()
 const passwd = aesjs.getEncPasswdToHex("my password", key)
@@ -37,17 +36,14 @@ const category = 'google'
 const remoteParams = { key: 'myKey', value: 'myValue' }
 const remoteHeaders = { key: 'myHeaderType', value: 'myHeaderValue' }
 
-dbHelper.insRemoteParams(settingsDb, remoteParams)
-dbHelper.insRemoteHeaders(settingsDb, remoteHeaders)
-console.log(dbHelper.getAll(settingsDb, miscConstants.entityTypes.remoteParams))
-console.log(dbHelper.getAll(settingsDb, miscConstants.entityTypes.remoteHeaders))
+dbHelper.insRemoteParam(settingsDb, remoteParams)
+dbHelper.insRemoteHeader(settingsDb, remoteHeaders)
 
 dbHelper.insPassword(dataDb, password)
-//db.insCategory(category)
-//
+dbHelper.insCategory(dataDb, category)
+dbHelper.insPasswordCategory(dataDb, 1, category)
 //console.log(db.getOne('passwords', 1))
-//
-//console.log(db.getAll('passwords'))
+console.log(db.getAll('passwords'))
 
 dbHelper.close([settingsDb, dataDb])
 

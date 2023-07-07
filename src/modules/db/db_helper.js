@@ -106,22 +106,22 @@ function insertPassword(db, passwd) {
         encId: passwd.encId
     }
     
-    return insertEntity(db, sql, params, miscConstants.entityTypes.password, params.title) 
+    return insertEntity(db, sql, params, miscConstants.entityTypes.passwords, params.title) 
 }
 
 function insertCategory(db, category) {
     const sql = `insert into categories values (?);`
     
-    return insertEntity(db, sql, category, miscConstants.entityTypes.category, category)
+    return insertEntity(db, sql, category, miscConstants.entityTypes.categories, category)
 }
 
 function insertPasswordCategory(db, passwordId, category) {
     const sql = `insert into passwords_categories values (?, ?);`
 
-    insertEntity(db, sql, [passwordId, category], miscConstants.entityTypes.passwordCategory, entityTitle)
+    insertEntity(db, sql, [passwordId, category], miscConstants.entityTypes.passwordCategories, `p id: ${passwordId}, cat: ${category}`)
 }
 
-function insertRemoteParameters(db, parameters) {
+function insertRemoteParameter(db, parameter) {
     const sql = `insert into remote_parameters (\
         key,\
         value) values (\
@@ -129,10 +129,10 @@ function insertRemoteParameters(db, parameters) {
         $value
     );`
     
-    insertEntity(db, sql, parameters, miscConstants.entityTypes.remoteParams, parameters.key)
+    insertEntity(db, sql, parameter, miscConstants.entityTypes.remoteParams, parameter.key)
 }
 
-function insertRemoteHeaders(db, headers) {
+function insertRemoteHeader(db, header) {
     const sql = `insert into remote_headers (\
         key,\
         value) values (\
@@ -140,22 +140,22 @@ function insertRemoteHeaders(db, headers) {
         $value
     );`
     
-    insertEntity(db, sql, headers, miscConstants.entityTypes.remoteHeaders, headers.key)
+    insertEntity(db, sql, header, miscConstants.entityTypes.remoteHeaders, header.key)
 }
 
-function insertEntity(db, sql, params, entityType='', entityTitle='') {
+function insertEntity(db, sql, params, entityType='', entityValue='') {
     try {
         const stmt = db.prepare(sql)
         const info = stmt.run(params)
         console.log(info)
 
-        const logMsg = `inserted ${entityType} ${entityTitle} on row id ${info.lastInsertRowid}`
+        const logMsg = `inserted into ${entityType} ${entityValue.toString()} on row id ${info.lastInsertRowid}`
 
         logging.logDbTransaction(logMsg)
 
         return info.lastInsertRowid
     } catch (ex) {
-        const errorMsg = `error inserting ${entityType} ${entityTitle}`
+        const errorMsg = `error inserting ${entityType} ${entityValue}`
 
         logging.logDbTransaction(errorMsg, ex)
     }
@@ -169,7 +169,7 @@ exports.dbHelper = {
     insCategory: insertCategory,
     insPassword: insertPassword,
     insPasswordCategory: insertPasswordCategory,
-    insRemoteHeaders: insertRemoteHeaders,
-    insRemoteParams: insertRemoteParameters,
+    insRemoteHeader: insertRemoteHeader,
+    insRemoteParam: insertRemoteParameter,
 }
 
