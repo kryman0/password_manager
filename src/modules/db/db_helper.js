@@ -4,7 +4,6 @@ const path = require('node:path')
 const Database = require('better-sqlite3')
 
 const { miscConstants } = require(path.resolve('src/modules/constants/misc'))
-const { paths } = require(path.resolve('src/modules/constants/paths'))
 const { logging } = require(path.resolve('src/modules/logging/db_logging'))
 
 // close db when app closes, etc.
@@ -24,7 +23,7 @@ exports.getOrCreateDb = function getOrCreateDb(pathToDb) {
     return new Database(pathToDb, dbOpts)
 }
 
-exports.setupDbSchema = function setupDbSchema(pathToSchema, instance) {
+exports.setupDbSchema = function setupDbSchema(pathToSchema, instance, useFK=false) {
     try {
         let setupDbFile = fs.readFileSync(pathToSchema, 'utf8')
 
@@ -32,7 +31,7 @@ exports.setupDbSchema = function setupDbSchema(pathToSchema, instance) {
             throw new Error("Could not read the sqlite setup file")
         }
         
-        if (pathToSchema === paths.db.dataDb) {
+        if (useFK) {
             instance.pragma('foreign_keys = ON')
         }
 
@@ -107,19 +106,19 @@ function insertPassword(db, passwd) {
         encId: passwd.encId
     }
     
-    return insertEntity(db, sql, params, entityTypes.password, params.title) 
+    return insertEntity(db, sql, params, miscConstants.entityTypes.password, params.title) 
 }
 
 function insertCategory(db, category) {
     const sql = `insert into categories values (?);`
     
-    return insertEntity(db, sql, category, entityTypes.category, category)
+    return insertEntity(db, sql, category, miscConstants.entityTypes.category, category)
 }
 
 function insertPasswordCategory(db, passwordId, category) {
     const sql = `insert into passwords_categories values (?, ?);`
 
-    insertEntity(db, sql, [passwordId, category], entityType, entityTitle)
+    insertEntity(db, sql, [passwordId, category], miscConstants.entityTypes.passwordCategory, entityTitle)
 }
 
 function insertRemoteParameters(db, parameters) {
@@ -172,6 +171,5 @@ exports.dbHelper = {
     insPasswordCategory: insertPasswordCategory,
     insRemoteHeaders: insertRemoteHeaders,
     insRemoteParams: insertRemoteParameters,
-    restore: restoreDb,
 }
 

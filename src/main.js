@@ -11,19 +11,18 @@ const { fsHelper } = require(path.resolve('src/modules/helpers/fs'))
 
 fsHelper.createFolderIfNonExisting(path.join(paths.folders.userHome, paths.folders.appFolder))
 
+const { dataDB } = require(path.resolve('src/modules/db/data_db'))
 const { settingsDB } = require(path.resolve('src/modules/db/settings_db'))
 
 
-const settiDb = settingsDB.getDb()
+const dataDb = dataDB.getDb()
+const settingsDb = settingsDB.getDb()
 //if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
-
-//db.restore()
+console.log(dataDb, settingsDb)
 
 const key = aesjs.generateKey()
-
 const passwd = aesjs.getEncPasswdToHex("my password", key)
 const decrPasswd = aesjs.getDecPasswdFromHex(passwd, key)
-
 const password = {
     title: 'test title',
     username: 'user1',
@@ -33,27 +32,24 @@ const password = {
     encId: 2,
     key: null
 }
-
 const category = 'google'
-
-const getPasswdSql = 'select * from passwords where title = "test title";'
 
 const remoteParams = { key: 'myKey', value: 'myValue' }
 const remoteHeaders = { key: 'myHeaderType', value: 'myHeaderValue' }
 
-dbHelper.insRemoteParams(settiDb, remoteParams)
-dbHelper.insRemoteHeaders(settiDb, remoteHeaders)
-console.log(dbHelper.getAll(settiDb, miscConstants.entityTypes.remoteParams))
-console.log(dbHelper.getAll(settiDb, miscConstants.entityTypes.remoteHeaders))
+dbHelper.insRemoteParams(settingsDb, remoteParams)
+dbHelper.insRemoteHeaders(settingsDb, remoteHeaders)
+console.log(dbHelper.getAll(settingsDb, miscConstants.entityTypes.remoteParams))
+console.log(dbHelper.getAll(settingsDb, miscConstants.entityTypes.remoteHeaders))
 
-//db.insPassword(password)
+dbHelper.insPassword(dataDb, password)
 //db.insCategory(category)
 //
 //console.log(db.getOne('passwords', 1))
 //
 //console.log(db.getAll('passwords'))
-//
-dbHelper.close([settiDb])
+
+dbHelper.close([settingsDb, dataDb])
 
 //const createWindow = () => {
 //    const win = new BrowserWindow({
