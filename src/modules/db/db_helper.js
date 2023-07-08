@@ -118,7 +118,7 @@ function insertCategory(db, category) {
 function insertPasswordCategory(db, passwordId, category) {
     const sql = `insert into passwords_categories values (?, ?);`
 
-    insertEntity(db, sql, [passwordId, category], miscConstants.entityTypes.passwordCategories, `p id: ${passwordId}, cat: ${category}`)
+    insertEntity(db, sql, [passwordId, category], miscConstants.entityTypes.passwordsCategories, `p id: ${passwordId}, cat: ${category}`)
 }
 
 function insertRemoteParameter(db, parameter) {

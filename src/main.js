@@ -43,7 +43,9 @@ dbHelper.insPassword(dataDb, password)
 dbHelper.insCategory(dataDb, category)
 dbHelper.insPasswordCategory(dataDb, 1, category)
 //console.log(db.getOne('passwords', 1))
-console.log(db.getAll('passwords'))
+console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.passwords))
+console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.categories))
+console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.passwordsCategories))
 
 dbHelper.close([settingsDb, dataDb])
 
