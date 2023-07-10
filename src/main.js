@@ -1,7 +1,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, net } = require('electron')
 
 const { miscConstants } = require(path.resolve('src/modules/constants/misc'))
 const { paths } = require(path.resolve('src/modules/constants/paths'))
@@ -33,44 +33,80 @@ const password = {
 }
 const category = 'google'
 
-const remoteParams = { key: 'myKey', value: 'myValue' }
+const remoteParams = [
+    { key: 'sp', value: 'racwdl' },
+    { key: 'st', value: '2023-07-10T08:37:22Z' },
+    { key: 'se', value: '2023-07-10T16:37:22Z' },
+    { key: 'spr', value: 'https' },
+    { key: 'sv', value: '2022-11-02' },
+    { key: 'sr', value: 'c' },
+    { key: 'sig', value: 'Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D' },
+]
 const remoteHeaders = { key: 'myHeaderType', value: 'myHeaderValue' }
+const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/electronfile1?sp=racwdl&st=2023-07-10T08:37:22Z&se=2023-07-10T16:37:22Z&spr=https&sv=2022-11-02&sr=c&sig=Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D'
+const url = 'https://krystianmanczak.blob.core.windows.net/test/electronfile2'
 
-dbHelper.insRemoteParam(settingsDb, remoteParams)
+dbHelper.insRemoteAddress(settingsDb, url)
+//dbHelper.insRemoteParam(settingsDb, remoteParams)
 dbHelper.insRemoteHeader(settingsDb, remoteHeaders)
 
-dbHelper.insPassword(dataDb, password)
-dbHelper.insCategory(dataDb, category)
-dbHelper.insPasswordCategory(dataDb, 1, category)
-//console.log(db.getOne('passwords', 1))
-console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.passwords))
-console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.categories))
-console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.passwordsCategories))
+for (const property of remoteParams) {
+    dbHelper.insRemoteParam(settingsDb, property)
+}
 
-dbHelper.close([settingsDb, dataDb])
+//dbHelper.insPassword(dataDb, password)
+//dbHelper.insCategory(dataDb, category)
+//dbHelper.insPasswordCategory(dataDb, 1, category)
+////console.log(db.getOne('passwords', 1))
+//console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.passwords))
+//console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.categories))
+//console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.passwordsCategories))
 
-//const createWindow = () => {
-//    const win = new BrowserWindow({
-//        width: 800,
-//        height: 600,
-//        webPreferences: {
-//            preload: path.join(__dirname, 'preload.js')
-//        }
-//    })
-//
-//    win.loadFile(path.join(__dirname, 'windows/index.html'))
-//}
-//
-//
-//app.whenReady().then(() => {
-//    createWindow()
-//
-//    app.on('activate', () => {
-//        if (BrowserWindow.getAllWindows().length === 0) createWindow()
-//    })
-//})
-//
-//
-//app.on('window-all-closed', () => {
-//    if (process.platform !== 'darwin') app.quit()
-//})
+
+const createWindow = () => {
+    const win = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js')
+        }
+    })
+
+    win.loadFile(path.join(__dirname, 'windows/index.html'))
+}
+
+
+app.whenReady().then(() => {
+    //createWindow()
+
+    //app.on('activate', () => {
+    //    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    //})
+    
+    const settings = dbHelper.getAll(settingsDb, miscConstants.entityTypes.settings)[0]
+    console.log('settings', settings)
+
+    const request = net.request({
+        method: settings.remote_http_method,
+        url:    settings.path_remote_db
+    })
+    //request.setHeader('x-ms-date', new Date().toUTCString())
+    //request.setHeader('Authorization', '="SharedKey krystianmanczak.blob.core.windows.net:2%2FLNHROZRs7gjN5dpHsinUXVWiN2Mpy5EtZoDOmyKGQ%3D"')
+    //request.setHeader('x-ms-version', '2022-11-02')
+
+    request.setHeader('x-ms-blob-type', 'BlockBlob')
+    request.write('yo from electron')
+    request.on('response', (response) => {
+        response.on('end', () => console.log('no more data'))
+        response.on('data', (chunk) => console.log(chunk.toString()))
+    })
+    request.end()
+    
+
+    dbHelper.close([settingsDb, dataDb])
+})
+
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit()
+})

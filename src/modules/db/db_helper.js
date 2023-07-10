@@ -9,11 +9,17 @@ const { logging } = require(path.resolve('src/modules/logging/db_logging'))
 // close db when app closes, etc.
 
 function closeDb(dbs) {
-    console.log("from closedb", dbs)
     for (let i = 0; i < dbs.length; i++) {
-        dbs[i].close()
+        let db = dbs[i]
+
+        try {
+            db.close()
+        } catch (ex) {
+            const errMsg = `error closing ${db}`
+
+            logging.logDbTransaction(errMsg, ex)            
+        }
     }
-    console.log("from closedb", dbs)
 }
 
 
@@ -62,16 +68,16 @@ function getAllEntities(db, entity) {
     }
 }
 
-function getEntity(db, entity, id) {
-    const sql = `select * from ${entity} where id = ?;`
+function getEntity(db, entity, column, value) {
+    const sql = `select * from ${entity} where ${column} = ?;`
     
     try {
         const stmt = db.prepare(sql)
-        const row = stmt.get(id)
+        const row = stmt.get(value)
 
         return row
     } catch (ex) {
-        const logErrMsg = `error getting ${entity}`
+        const logErrMsg = `error getting ${column} from ${entity}`
 
         logging.logDbTransaction(logErrMsg, ex)
     }
@@ -143,11 +149,16 @@ function insertRemoteHeader(db, header) {
     insertEntity(db, sql, header, miscConstants.entityTypes.remoteHeaders, header.key)
 }
 
+function updateRemoteAddress(db, address) {
+    const sql = 'update settings set path_remote_db = ?'
+
+    insertEntity(db, sql, address, miscConstants.entityTypes.settings, 'remote address ' + address)
+}
+
 function insertEntity(db, sql, params, entityType='', entityValue='') {
     try {
         const stmt = db.prepare(sql)
         const info = stmt.run(params)
-        console.log(info)
 
         const logMsg = `inserted into ${entityType} ${entityValue.toString()} on row id ${info.lastInsertRowid}`
 
@@ -155,7 +166,7 @@ function insertEntity(db, sql, params, entityType='', entityValue='') {
 
         return info.lastInsertRowid
     } catch (ex) {
-        const errorMsg = `error inserting ${entityType} ${entityValue}`
+        const errorMsg = `error inserting ${entityType} ${entityValue.toString()}`
 
         logging.logDbTransaction(errorMsg, ex)
     }
@@ -171,5 +182,6 @@ exports.dbHelper = {
     insPasswordCategory: insertPasswordCategory,
     insRemoteHeader: insertRemoteHeader,
     insRemoteParam: insertRemoteParameter,
+    updRemoteAddress: updateRemoteAddress,
 }
 
