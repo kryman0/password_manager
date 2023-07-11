@@ -3,7 +3,7 @@ const path = require('node:path')
 
 const Database = require('better-sqlite3')
 
-const { miscConstants } = require(path.resolve('src/modules/constants/misc'))
+const { getDbMsgForLogging, miscConstants } = require(path.resolve('src/modules/constants/misc'))
 const { logging } = require(path.resolve('src/modules/logging/db_logging'))
 
 // close db when app closes, etc.
@@ -185,10 +185,15 @@ function deleteAllEntities(db, entity) {
 function runQuery(db, sql, params, entityType, entityValue, crud) {
     try {
         const stmt = db.prepare(sql)
-        const info = stmt.run()
+        const info = stmt.run(params)
 
-        let logSuccessMsg, logErrorMsg;
+        const logMsg = getDbMsgForLogging(crud, info, entityType, entityValue)
 
+        logging.logDbTransaction(logMsg.success)
+    } catch (ex) {
+        const logErrMsg = getDbMsgForLogging(crud, entityType, entityValue)
+
+        logging.logDbTransaction(logErrMsg.error, ex)
     }
 }
 
