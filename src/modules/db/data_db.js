@@ -9,7 +9,6 @@ const { getOrCreateDb, isDbCreated, setupDbSchema } = require(path.resolve('src/
 
 const dataDB = (function() {
     let instance = isDbCreated(paths.db.dataDB)
-    console.log("instance from dataDB", instance)
 
     return {
         getDb: function() {

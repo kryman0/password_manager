@@ -46,7 +46,7 @@ const remoteHeaders = { key: 'myHeaderType', value: 'myHeaderValue' }
 const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/electronfile1?sp=racwdl&st=2023-07-10T08:37:22Z&se=2023-07-10T16:37:22Z&spr=https&sv=2022-11-02&sr=c&sig=Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D'
 const url = 'https://krystianmanczak.blob.core.windows.net/test/electronfile2'
 
-dbHelper.insRemoteAddress(settingsDb, url)
+dbHelper.updRemoteAddress(settingsDb, url)
 //dbHelper.insRemoteParam(settingsDb, remoteParams)
 dbHelper.insRemoteHeader(settingsDb, remoteHeaders)
 
@@ -85,6 +85,10 @@ app.whenReady().then(() => {
     
     const settings = dbHelper.getAll(settingsDb, miscConstants.entityTypes.settings)[0]
     console.log('settings', settings)
+    
+    const params = dbHelper.getAll(settingsDb, miscConstants.entityTypes.remoteParams)
+    console.log(params)
+
 
     const request = net.request({
         method: settings.remote_http_method,
@@ -110,3 +114,4 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()
 })
+

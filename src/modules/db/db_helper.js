@@ -172,6 +172,26 @@ function insertEntity(db, sql, params, entityType='', entityValue='') {
     }
 }
 
+function deleteAllEntities(db, entity) {
+    const sql = `delete from ${entity}`
+
+    try {
+        const stmt = db.prepare(sql)
+        const info = stmt.run(stmt)
+
+    }
+}
+
+function runQuery(db, sql, params, entityType, entityValue, crud) {
+    try {
+        const stmt = db.prepare(sql)
+        const info = stmt.run()
+
+        let logSuccessMsg, logErrorMsg;
+
+    }
+}
+
 
 exports.dbHelper = {
     close: closeDb,
