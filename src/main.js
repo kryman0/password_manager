@@ -35,20 +35,21 @@ const category = 'google'
 
 const remoteParams = [
     { key: 'sp', value: 'racwdl' },
-    { key: 'st', value: '2023-07-10T08:37:22Z' },
-    { key: 'se', value: '2023-07-10T16:37:22Z' },
+    { key: 'st', value: '2023-07-12T11:23:56Z' },
+    { key: 'se', value: '2023-07-15T19:23:56Z' },
     { key: 'spr', value: 'https' },
     { key: 'sv', value: '2022-11-02' },
     { key: 'sr', value: 'c' },
-    { key: 'sig', value: 'Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D' },
+    { key: 'sig', value: '9zIeIEGfTWr5uOOZ8A8xzLcyGAxeT4OKTRcqaoyCako%3D' },
 ]
 const remoteHeaders = { key: 'myHeaderType', value: 'myHeaderValue' }
 const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/electronfile1?sp=racwdl&st=2023-07-10T08:37:22Z&se=2023-07-10T16:37:22Z&spr=https&sv=2022-11-02&sr=c&sig=Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D'
-const url = 'https://krystianmanczak.blob.core.windows.net/test/electronfile2'
+const url = 'https://krystianmanczak.blob.core.windows.net/test/electronfile3'
 
 dbHelper.updRemoteAddress(settingsDb, url)
 //dbHelper.insRemoteParam(settingsDb, remoteParams)
 dbHelper.insRemoteHeader(settingsDb, remoteHeaders)
+dbHelper.deleteAll(settingsDb, miscConstants.entityTypes.remoteParams)
 
 for (const property of remoteParams) {
     dbHelper.insRemoteParam(settingsDb, property)

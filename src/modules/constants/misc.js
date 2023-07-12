@@ -7,8 +7,14 @@ const entityTypes = {
     settings:               'settings',
 }
 
-function getDbMsgForLogging(crud, info='', entityType, entityValueOrColumn='') {
-    entityValueOrColumn = entityValue.toString()
+const crud = {
+    insert: 'insert',
+    update: 'update',
+    delete: 'delete',
+}
+
+function getDbMsgForLogging(crud, info, entityType, entityValueOrColumn='') {
+    entityValueOrColumn = entityValueOrColumn.toString()
 
     const dbLoggingMsg = {
         insert: {
@@ -43,6 +49,7 @@ function getDbMsgForLogging(crud, info='', entityType, entityValueOrColumn='') {
 
 
 exports.miscConstants = {
+    crud: crud,
     entityTypes: entityTypes,
     getDbMsgForLogging: getDbMsgForLogging,
 }

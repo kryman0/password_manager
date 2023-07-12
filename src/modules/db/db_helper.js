@@ -112,19 +112,21 @@ function insertPassword(db, passwd) {
         encId: passwd.encId
     }
     
-    return insertEntity(db, sql, params, miscConstants.entityTypes.passwords, params.title) 
+    runQuery(db, sql, params, miscConstants.entityTypes.passwords, params.title, miscConstants.crud.insert) 
 }
 
 function insertCategory(db, category) {
     const sql = `insert into categories values (?);`
     
-    return insertEntity(db, sql, category, miscConstants.entityTypes.categories, category)
+    runQuery(db, sql, category, miscConstants.entityTypes.categories, category, miscConstants.crud.insert)
 }
 
 function insertPasswordCategory(db, passwordId, category) {
     const sql = `insert into passwords_categories values (?, ?);`
 
-    insertEntity(db, sql, [passwordId, category], miscConstants.entityTypes.passwordsCategories, `p id: ${passwordId}, cat: ${category}`)
+    const entityValue = `password id: ${passwordId}, category: ${category}`
+
+    runQuery(db, sql, [passwordId, category], miscConstants.entityTypes.passwordsCategories, entityValue, miscConstants.crud.insert)
 }
 
 function insertRemoteParameter(db, parameter) {
@@ -135,7 +137,7 @@ function insertRemoteParameter(db, parameter) {
         $value
     );`
     
-    insertEntity(db, sql, parameter, miscConstants.entityTypes.remoteParams, parameter.key)
+    runQuery(db, sql, parameter, miscConstants.entityTypes.remoteParams, parameter.key, miscConstants.crud.insert)
 }
 
 function insertRemoteHeader(db, header) {
@@ -146,60 +148,42 @@ function insertRemoteHeader(db, header) {
         $value
     );`
     
-    insertEntity(db, sql, header, miscConstants.entityTypes.remoteHeaders, header.key)
+    runQuery(db, sql, header, miscConstants.entityTypes.remoteHeaders, header.key, miscConstants.crud.insert)
 }
 
 function updateRemoteAddress(db, address) {
     const sql = 'update settings set path_remote_db = ?'
 
-    insertEntity(db, sql, address, miscConstants.entityTypes.settings, 'remote address ' + address)
-}
+    const entityValue = 'remote address ' + address
 
-function insertEntity(db, sql, params, entityType='', entityValue='') {
-    try {
-        const stmt = db.prepare(sql)
-        const info = stmt.run(params)
-
-        const logMsg = `inserted into ${entityType} ${entityValue.toString()} on row id ${info.lastInsertRowid}`
-
-        logging.logDbTransaction(logMsg)
-
-        return info.lastInsertRowid
-    } catch (ex) {
-        const errorMsg = `error inserting ${entityType} ${entityValue.toString()}`
-
-        logging.logDbTransaction(errorMsg, ex)
-    }
+    runQuery(db, sql, address, miscConstants.entityTypes.settings, entityValue, miscConstants.crud.update)
 }
 
 function deleteAllEntities(db, entity) {
     const sql = `delete from ${entity}`
 
-    try {
-        const stmt = db.prepare(sql)
-        const info = stmt.run(stmt)
-
-    }
+    runQuery(db, sql, '', entity, '', miscConstants.crud.delete)
 }
 
-function runQuery(db, sql, params, entityType, entityValue, crud) {
+function runQuery(db, sql, params='', entityType, entityValue='', crud) {
     try {
         const stmt = db.prepare(sql)
-        const info = stmt.run(params)
+        const info = stmt.run(params || [])
 
-        const logMsg = getDbMsgForLogging(crud, info, entityType, entityValue)
+        const logMsg = miscConstants.getDbMsgForLogging(crud, info, entityType, entityValue)
 
         logging.logDbTransaction(logMsg.success)
     } catch (ex) {
-        const logErrMsg = getDbMsgForLogging(crud, entityType, entityValue)
+        const logMsg = miscConstants.getDbMsgForLogging(crud, '', entityType, entityValue)
 
-        logging.logDbTransaction(logErrMsg.error, ex)
+        logging.logDbTransaction(logMsg.error, ex)
     }
 }
 
 
 exports.dbHelper = {
     close: closeDb,
+    deleteAll: deleteAllEntities,
     getAll: getAllEntities,
     getOne: getEntity,
     insCategory: insertCategory,
