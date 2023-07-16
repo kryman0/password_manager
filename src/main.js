@@ -35,18 +35,19 @@ const category = 'google'
 
 const remoteParams = [
     { key: 'sp', value: 'racwdl' },
-    { key: 'st', value: '2023-07-12T11:23:56Z' },
-    { key: 'se', value: '2023-07-15T19:23:56Z' },
+    { key: 'st', value: '2023-07-16T08:27:31Z' },
+    { key: 'se', value: '2023-07-16T16:27:31Z' },
     { key: 'spr', value: 'https' },
     { key: 'sv', value: '2022-11-02' },
     { key: 'sr', value: 'c' },
-    { key: 'sig', value: '9zIeIEGfTWr5uOOZ8A8xzLcyGAxeT4OKTRcqaoyCako%3D' },
+    { key: 'sig', value: 'CyXmlUI9ose7oGVbSv3dEOpT9coU72cRGvEpsNN%2FWX0%3D' },
 ]
 const remoteHeaders = { key: 'myHeaderType', value: 'myHeaderValue' }
 const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/electronfile1?sp=racwdl&st=2023-07-10T08:37:22Z&se=2023-07-10T16:37:22Z&spr=https&sv=2022-11-02&sr=c&sig=Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D'
-const url = 'https://krystianmanczak.blob.core.windows.net/test/electronfile3'
+const url = 'https://krystianmanczak.blob.core.windows.net/test/test_file2?comp=appendblock'
 
-dbHelper.updRemoteAddress(settingsDb, url)
+dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'path_remote_db', url)
+dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'remote_http_method', 'PUT')
 //dbHelper.insRemoteParam(settingsDb, remoteParams)
 dbHelper.insRemoteHeader(settingsDb, remoteHeaders)
 dbHelper.deleteAll(settingsDb, miscConstants.entityTypes.remoteParams)
@@ -99,11 +100,13 @@ app.whenReady().then(() => {
     //request.setHeader('Authorization', '="SharedKey krystianmanczak.blob.core.windows.net:2%2FLNHROZRs7gjN5dpHsinUXVWiN2Mpy5EtZoDOmyKGQ%3D"')
     //request.setHeader('x-ms-version', '2022-11-02')
 
-    request.setHeader('x-ms-blob-type', 'BlockBlob')
-    request.write('yo from electron')
+    request.setHeader('x-ms-blob-type', 'AppendBlob')
+    request.write('first line from electron')
     request.on('response', (response) => {
         response.on('end', () => console.log('no more data'))
-        response.on('data', (chunk) => console.log(chunk.toString()))
+        response.on('data', (chunk) => {
+            console.log(chunk.toString())
+        })
     })
     request.end()
     

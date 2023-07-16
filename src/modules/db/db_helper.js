@@ -151,12 +151,10 @@ function insertRemoteHeader(db, header) {
     runQuery(db, sql, header, miscConstants.entityTypes.remoteHeaders, header.key, miscConstants.crud.insert)
 }
 
-function updateRemoteAddress(db, address) {
-    const sql = 'update settings set path_remote_db = ?'
+function update(db, table, column, value) {
+    const sql = `update ${table} set ${column} = ?`
 
-    const entityValue = 'remote address ' + address
-
-    runQuery(db, sql, address, miscConstants.entityTypes.settings, entityValue, miscConstants.crud.update)
+    runQuery(db, sql, value, table, value, miscConstants.crud.update)
 }
 
 function deleteAllEntities(db, entity) {
@@ -191,6 +189,6 @@ exports.dbHelper = {
     insPasswordCategory: insertPasswordCategory,
     insRemoteHeader: insertRemoteHeader,
     insRemoteParam: insertRemoteParameter,
-    updRemoteAddress: updateRemoteAddress,
+    update: update,
 }
 
