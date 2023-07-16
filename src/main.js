@@ -33,11 +33,20 @@ const password = {
 }
 const category = 'google'
 
+const remoteParams = [
+    { key: 'sp', value: 'racwdl' },
+    { key: 'st', value: '2023-07-16T08:27:31Z' },
+    { key: 'se', value: '2023-07-16T16:27:31Z' },
+    { key: 'spr', value: 'https' },
+    { key: 'sv', value: '2022-11-02' },
+    { key: 'sr', value: 'c' },
+    { key: 'sig', value: 'CyXmlUI9ose7oGVbSv3dEOpT9coU72cRGvEpsNN%2FWX0%3D' },
+]
 const remoteHeaders = { key: 'myHeaderType', value: 'myHeaderValue' }
-const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/test_file2?comp=appendblock&sp=racwdl&st=2023-07-22T16:13:07Z&se=2023-07-24T00:13:07Z&spr=https&sv=2022-11-02&sr=c&sig=ztuBF4aHnze4SnCWxu20cwHwfMX4IHkhTas4OYnZSq4%3D'
+const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/electronfile1?sp=racwdl&st=2023-07-10T08:37:22Z&se=2023-07-10T16:37:22Z&spr=https&sv=2022-11-02&sr=c&sig=Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D'
 const url = 'https://krystianmanczak.blob.core.windows.net/test/test_file2?comp=appendblock'
 
-dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'path_remote_db', fullURL)
+dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'path_remote_db', url)
 dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'remote_http_method', 'PUT')
 //dbHelper.insRemoteParam(settingsDb, remoteParams)
 dbHelper.insRemoteHeader(settingsDb, remoteHeaders)
@@ -84,6 +93,7 @@ app.whenReady().then(() => {
     //request.setHeader('x-ms-version', '2022-11-02')
 
     request.write('\nanother line from electron')
+    request.setHeader('x-ms-blob-type', 'AppendBlob')
     request.on('response', (response) => {
         response.on('end', () => console.log('no more data'))
         response.on('data', (chunk) => {
