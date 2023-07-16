@@ -17,13 +17,6 @@ create table if not exists settings (
     remote_http_method text default GET
 );
 
--- create remote_parameters
-create table if not exists remote_parameters (
-    key text unique on conflict ignore,
-    value text not null
-);
-
-
 -- create remote_headers
 create table if not exists remote_headers (
     key text unique on conflict ignore,
