@@ -177,7 +177,6 @@ exports.dbHelper = {
     insPassword: insertPassword,
     insPasswordCategory: insertPasswordCategory,
     insRemoteHeader: insertRemoteHeader,
-    insRemoteParam: insertRemoteParameter,
     update: update,
 }
 

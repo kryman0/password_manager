@@ -34,18 +34,14 @@ const password = {
 const category = 'google'
 
 const remoteHeaders = { key: 'myHeaderType', value: 'myHeaderValue' }
-const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/electronfile1?sp=racwdl&st=2023-07-10T08:37:22Z&se=2023-07-10T16:37:22Z&spr=https&sv=2022-11-02&sr=c&sig=Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D'
+const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/test_file2?comp=appendblock&sp=racwdl&st=2023-07-22T16:13:07Z&se=2023-07-24T00:13:07Z&spr=https&sv=2022-11-02&sr=c&sig=ztuBF4aHnze4SnCWxu20cwHwfMX4IHkhTas4OYnZSq4%3D'
 const url = 'https://krystianmanczak.blob.core.windows.net/test/test_file2?comp=appendblock'
 
-dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'path_remote_db', url)
+dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'path_remote_db', fullURL)
 dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'remote_http_method', 'PUT')
 //dbHelper.insRemoteParam(settingsDb, remoteParams)
 dbHelper.insRemoteHeader(settingsDb, remoteHeaders)
 dbHelper.deleteAll(settingsDb, miscConstants.entityTypes.remoteParams)
-
-for (const property of remoteParams) {
-    dbHelper.insRemoteParam(settingsDb, property)
-}
 
 //dbHelper.insPassword(dataDb, password)
 //dbHelper.insCategory(dataDb, category)
@@ -79,10 +75,6 @@ app.whenReady().then(() => {
     const settings = dbHelper.getAll(settingsDb, miscConstants.entityTypes.settings)[0]
     console.log('settings', settings)
     
-    const params = dbHelper.getAll(settingsDb, miscConstants.entityTypes.remoteParams)
-    console.log(params)
-
-
     const request = net.request({
         method: settings.remote_http_method,
         url:    settings.path_remote_db
@@ -91,8 +83,7 @@ app.whenReady().then(() => {
     //request.setHeader('Authorization', '="SharedKey krystianmanczak.blob.core.windows.net:2%2FLNHROZRs7gjN5dpHsinUXVWiN2Mpy5EtZoDOmyKGQ%3D"')
     //request.setHeader('x-ms-version', '2022-11-02')
 
-    request.setHeader('x-ms-blob-type', 'AppendBlob')
-    request.write('first line from electron')
+    request.write('\nanother line from electron')
     request.on('response', (response) => {
         response.on('end', () => console.log('no more data'))
         response.on('data', (chunk) => {
