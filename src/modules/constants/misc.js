@@ -3,6 +3,7 @@ const entityTypes = {
     passwords:              'passwords',
     passwordsCategories:    'passwords_categories',
     remoteHeaders:          'remote_headers',
+    remoteParams:           'remote_parameters',
     settings:               'settings',
 }
 

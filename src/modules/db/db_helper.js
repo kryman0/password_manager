@@ -129,6 +129,17 @@ function insertPasswordCategory(db, passwordId, category) {
     runQuery(db, sql, [passwordId, category], miscConstants.entityTypes.passwordsCategories, entityValue, miscConstants.crud.insert)
 }
 
+function insertRemoteParameter(db, parameter) {
+    const sql = `insert into remote_parameters (\
+        key,\
+        value) values (\
+        $key,\
+        $value
+    );`
+
+    runQuery(db, sql, parameter, miscConstants.entityTypes.remoteParams, parameter.key, miscConstants.crud.insert)
+}
+
 function insertRemoteHeader(db, header) {
     const sql = `insert into remote_headers (\
         key,\
