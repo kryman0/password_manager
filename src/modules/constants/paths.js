@@ -1,6 +1,8 @@
 const { homedir } = require('node:os')
 const path = require('node:path')
 
+const { dbNames } = require(path.resolve('src/modules/constants/misc'))
+
 
 const folders = {
     userHome: homedir(),
@@ -8,8 +10,8 @@ const folders = {
 }
 
 const db = {
-    dataDB:             path.join(folders.userHome, folders.appFolder, 'pm_data_db.sqlite'),
-    settingsDB:         path.join(folders.userHome, folders.appFolder, 'pm_settings_db.sqlite'),
+    dataDB:             path.join(folders.userHome, folders.appFolder, dbNames.data),
+    settingsDB:         path.join(folders.userHome, folders.appFolder, dbNames.settings),
     schemaDataDB:       path.resolve('sql/setup_data.sqlite'),
     schemaSettingsDB:   path.resolve('sql/setup_settings.sqlite'),
 }

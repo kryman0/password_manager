@@ -13,6 +13,16 @@ const crud = {
     delete: 'delete',
 }
 
+const funcNames = {
+    insertRemoteParameter:  'insertRemoteParameter',
+    insertRemoteHeader:     'insertRemoteHeader',
+}
+
+const dbNames: {
+    data:       'pm_data_db.sqlite',
+    settings:   'pm_settings_db.sqlite',
+}
+
 function getDbMsgForLogging(crud, info, entityType, entityValueOrColumn='') {
     entityValueOrColumn = entityValueOrColumn.toString()
 
@@ -50,7 +60,9 @@ function getDbMsgForLogging(crud, info, entityType, entityValueOrColumn='') {
 
 exports.miscConstants = {
     crud: crud,
+    dbNames: dbNames,
     entityTypes: entityTypes,
+    funcNames: funcNames,
     getDbMsgForLogging: getDbMsgForLogging,
 }
 

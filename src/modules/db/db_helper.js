@@ -136,8 +136,10 @@ function insertRemoteParameter(db, parameter) {
         $key,\
         $value
     );`
-
-    runQuery(db, sql, parameter, miscConstants.entityTypes.remoteParams, parameter.key, miscConstants.crud.insert)
+    
+    for (const arr of parameter) {
+        runQuery(db, sql, arr, miscConstants.entityTypes.remoteParams, arr[0], miscConstants.crud.insert)
+    }
 }
 
 function insertRemoteHeader(db, header) {
