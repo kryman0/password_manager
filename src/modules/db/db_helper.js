@@ -6,6 +6,8 @@ const Database = require('better-sqlite3')
 const { getDbMsgForLogging, miscConstants } = require(path.resolve('src/modules/constants/misc'))
 const { logging } = require(path.resolve('src/modules/logging/db_logging'))
 
+const { various } = require(path.resolve('src/modules/helpers/various'))
+
 // close db when app closes, etc.
 
 function closeDb(dbs) {
@@ -29,6 +31,7 @@ exports.getOrCreateDb = function getOrCreateDb(pathToDb) {
     return new Database(pathToDb, dbOpts)
 }
 
+
 exports.setupDbSchema = function setupDbSchema(pathToSchema, instance, useFK=false) {
     try {
         let setupDbFile = fs.readFileSync(pathToSchema, 'utf8')
@@ -49,9 +52,11 @@ exports.setupDbSchema = function setupDbSchema(pathToSchema, instance, useFK=fal
     }
 }
 
+
 exports.isDbCreated = function isDbFileCreated(pathToDb) {
     return fs.existsSync(pathToDb)
 }
+
 
 function getAllEntities(db, entity) {
     const sql = `select * from ${entity};`
@@ -68,6 +73,7 @@ function getAllEntities(db, entity) {
     }
 }
 
+
 function getEntity(db, entity, column, value) {
     const sql = `select * from ${entity} where ${column} = ?;`
     
@@ -82,6 +88,7 @@ function getEntity(db, entity, column, value) {
         logging.logDbTransaction(logErrMsg, ex)
     }
 }
+
 
 function insertPassword(db, passwd) {
     const sql = `insert into passwords (\
@@ -115,43 +122,40 @@ function insertPassword(db, passwd) {
     runQuery(db, sql, params, miscConstants.entityTypes.passwords, params.title, miscConstants.crud.insert) 
 }
 
+
 function insertCategory(db, category) {
-    const sql = `insert into categories values (?);`
+    const sql = 'insert into categories values (?);'
     
     runQuery(db, sql, category, miscConstants.entityTypes.categories, category, miscConstants.crud.insert)
 }
 
+
 function insertPasswordCategory(db, passwordId, category) {
-    const sql = `insert into passwords_categories values (?, ?);`
+    const sql = 'insert into passwords_categories values (?, ?);'
 
     const entityValue = `password id: ${passwordId}, category: ${category}`
 
     runQuery(db, sql, [passwordId, category], miscConstants.entityTypes.passwordsCategories, entityValue, miscConstants.crud.insert)
 }
 
-function insertRemoteParameter(db, parameter) {
-    const sql = `insert into remote_parameters (\
-        key,\
-        value) values (\
-        $key,\
-        $value
-    );`
-    
-    for (const arr of parameter) {
+
+function insertRemoteParameter(db, parameters) {
+    const sql = 'insert into remote_parameters values (?, ?);'
+
+    let map = various.transformIntoMap(parameters)
+
+    for (const arr of map.entries()) {
         runQuery(db, sql, arr, miscConstants.entityTypes.remoteParams, arr[0], miscConstants.crud.insert)
     }
 }
 
+
 function insertRemoteHeader(db, header) {
-    const sql = `insert into remote_headers (\
-        key,\
-        value) values (\
-        $key,\
-        $value
-    );`
+    const sql = 'insert into remote_headers values (?, ?);'
     
     runQuery(db, sql, header, miscConstants.entityTypes.remoteHeaders, header.key, miscConstants.crud.insert)
 }
+
 
 function update(db, table, column, value) {
     const sql = `update ${table} set ${column} = ?`
@@ -159,14 +163,17 @@ function update(db, table, column, value) {
     runQuery(db, sql, value, table, value, miscConstants.crud.update)
 }
 
+
 function deleteAllEntities(db, entity) {
     const sql = `delete from ${entity}`
 
     runQuery(db, sql, '', entity, '', miscConstants.crud.delete)
 }
 
+
 function runQuery(db, sql, params='', entityType, entityValue='', crud) {
     try {
+        console.log(params)
         const stmt = db.prepare(sql)
         const info = stmt.run(params || [])
 

@@ -16,8 +16,6 @@ const settingsDB = (function() {
                 instance = getOrCreateDb(paths.db.settingsDB)
 
                 setupDbSchema(paths.db.schemaSettingsDB, instance)
-
-                insertDefaultLocalPathToDB(instance)
             } else {
                 instance = getOrCreateDb(paths.db.settingsDB)
             }
@@ -26,23 +24,6 @@ const settingsDB = (function() {
         }
     }
 })()
-
-function insertDefaultLocalPathToDB(db) {
-    const sql = `insert into settings (path_local_db) values ('${paths.db.settingsDB.toString()}');`
-
-    try {
-        const stmt = db.prepare(sql)
-        stmt.run()
-
-        const logMsg = 'inserted default local database path into settings'
-
-        logging.logDbTransaction(logMsg)
-    } catch (ex) {
-        const logErrMsg = 'error inserting default local path into settings db'
-
-        logging.logDbTransaction(logErrMsg, ex)
-    }
-}
 
 
 exports.settingsDB = settingsDB

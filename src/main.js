@@ -16,7 +16,7 @@ const { settingsDB } = require(path.resolve('src/modules/db/settings_db'))
 
 
 //const dataDb = dataDB.getDb()
-const dataDb = dataDb.restoreDb()
+const dataDb = dataDB.restoreDb()
 const settingsDb = settingsDB.getDb()
 //if (!db.isDbFileCreated()) db.setupDb() //check this for remote access
 
@@ -44,10 +44,6 @@ const remoteParams = [
     { key: 'sig', value: 'CyXmlUI9ose7oGVbSv3dEOpT9coU72cRGvEpsNN%2FWX0%3D' },
 ]
 
-const map = new Map()
-map.set('sp', 'racwdl')
-map.set('st', '2023-07-16T08:27:31Z')
-
 const remoteHeaders = { key: 'x-ms-blob-type', value: 'AppendBlob' }
 const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/electronfile1?sp=racwdl&st=2023-07-10T08:37:22Z&se=2023-07-10T16:37:22Z&spr=https&sv=2022-11-02&sr=c&sig=Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D'
 const url = 'https://krystianmanczak.blob.core.windows.net/test/test_file2?comp=appendblock'
@@ -56,13 +52,13 @@ dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'path_remote_db'
 dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'remote_http_method', 'PUT')
 dbHelper.insRemoteParam(settingsDb, remoteParams)
 dbHelper.insRemoteHeader(settingsDb, remoteHeaders)
-dbHelper.deleteAll(settingsDb, miscConstants.entityTypes.remoteParams)
+//dbHelper.deleteAll(settingsDb, miscConstants.entityTypes.remoteParams)
 
 //dbHelper.insPassword(dataDb, password)
 //dbHelper.insCategory(dataDb, category)
 //dbHelper.insPasswordCategory(dataDb, 1, category)
 ////console.log(db.getOne('passwords', 1))
-//console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.passwords))
+console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.remoteParams))
 //console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.categories))
 //console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.passwordsCategories))
 

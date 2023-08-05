@@ -18,7 +18,7 @@ const funcNames = {
     insertRemoteHeader:     'insertRemoteHeader',
 }
 
-const dbNames: {
+const dbNames = {
     data:       'pm_data_db.sqlite',
     settings:   'pm_settings_db.sqlite',
 }
