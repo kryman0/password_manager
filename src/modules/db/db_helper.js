@@ -150,10 +150,14 @@ function insertRemoteParameter(db, parameters) {
 }
 
 
-function insertRemoteHeader(db, header) {
+function insertRemoteHeader(db, headers) {
     const sql = 'insert into remote_headers values (?, ?);'
     
-    runQuery(db, sql, header, miscConstants.entityTypes.remoteHeaders, header.key, miscConstants.crud.insert)
+    let map = various.transformIntoMap(headers)
+
+    for (const arr of map.entries()) {
+        runQuery(db, sql, arr, miscConstants.entityTypes.remoteHeaders, arr[0], miscConstants.crud.insert)
+    }
 }
 
 

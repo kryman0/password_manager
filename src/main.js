@@ -44,7 +44,7 @@ const remoteParams = [
     { key: 'sig', value: 'CyXmlUI9ose7oGVbSv3dEOpT9coU72cRGvEpsNN%2FWX0%3D' },
 ]
 
-const remoteHeaders = { key: 'x-ms-blob-type', value: 'AppendBlob' }
+const remoteHeaders = [ { key: 'x-ms-blob-type', value: 'AppendBlob' } ]
 const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/electronfile1?sp=racwdl&st=2023-07-10T08:37:22Z&se=2023-07-10T16:37:22Z&spr=https&sv=2022-11-02&sr=c&sig=Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D'
 const url = 'https://krystianmanczak.blob.core.windows.net/test/test_file2?comp=appendblock'
 
@@ -58,7 +58,7 @@ dbHelper.insRemoteHeader(settingsDb, remoteHeaders)
 //dbHelper.insCategory(dataDb, category)
 //dbHelper.insPasswordCategory(dataDb, 1, category)
 ////console.log(db.getOne('passwords', 1))
-console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.remoteParams))
+console.log(dbHelper.getAll(settingsDb, miscConstants.entityTypes.remoteParams))
 //console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.categories))
 //console.log(dbHelper.getAll(dataDb, miscConstants.entityTypes.passwordsCategories))
 
