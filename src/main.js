@@ -44,11 +44,13 @@ const remoteParams = [
     { key: 'sig', value: 'CyXmlUI9ose7oGVbSv3dEOpT9coU72cRGvEpsNN%2FWX0%3D' },
 ]
 
+const settings = dbHelper.getAll(settingsDb, miscConstants.entityTypes.settings)
+
 const remoteHeaders = [ { key: 'x-ms-blob-type', value: 'AppendBlob' } ]
-const fullURL = 'https://krystianmanczak.blob.core.windows.net/test/electronfile1?sp=racwdl&st=2023-07-10T08:37:22Z&se=2023-07-10T16:37:22Z&spr=https&sv=2022-11-02&sr=c&sig=Fowpg7EXbtgJ8hgCtommIU6idWh9T%2FiElUQs01Z8H3A%3D'
+const fullURL = 'https://krystianmanczak.blob.core.windows.net/test?sp=racwdl&st=2023-10-08T08:49:57Z&se=2023-10-08T16:49:57Z&spr=https&sv=2022-11-02&sr=c&sig=AYsw5%2BT5wsf3Kl9%2FLMZP%2BDLfCQRFZgR7ovWExGrHgOY%3D'
 const url = 'https://krystianmanczak.blob.core.windows.net/test/test_file2?comp=appendblock'
 
-dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'path_remote_db', url)
+dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'path_remote_db', fullURL) // add constants for columns too
 dbHelper.update(settingsDb, miscConstants.entityTypes.settings, 'remote_http_method', 'PUT')
 dbHelper.insRemoteParam(settingsDb, remoteParams)
 dbHelper.insRemoteHeader(settingsDb, remoteHeaders)
@@ -112,4 +114,3 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit()
 })
-

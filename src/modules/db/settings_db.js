@@ -27,4 +27,3 @@ const settingsDB = (function() {
 
 
 exports.settingsDB = settingsDB
-

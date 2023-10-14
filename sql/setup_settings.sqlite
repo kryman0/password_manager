@@ -11,7 +11,9 @@ drop table if exists remote_headers;
 
 -- create settings
 create table if not exists settings (
-    remotely integer default 0 not null,
+    use_local_db integer default 1 not null,
+    use_remote_db integer default 0 not null,
+    path_local_db text null,
     path_remote_db text null,
     remote_http_method text default GET
 );
