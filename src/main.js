@@ -42,7 +42,7 @@ const remoteParams = [
     { key: 'spr', value: 'https' },
     { key: 'sv', value: '2022-11-02' },
     { key: 'sr', value: 'c' },
-    { key: 'sig', value: 'CyXmlUI9ose7oGVbSv3dEOpT9coU72cRGvEpsNN%2FWX0%3D' },
+    { key: 'sig', value: 'sigkeyshouldbeusedhere' },
 ]
 
 const settings = db.getAll(settingsDb, miscConstants.entityTypes.settings)
@@ -99,7 +99,7 @@ app.whenReady().then(() => {
     * Test data
     */
     request.setHeader('x-ms-date', new Date().toUTCString())
-    request.setHeader('Authorization', '="SharedKey krystianmanczak.blob.core.windows.net:2%2FLNHROZRs7gjN5dpHsinUXVWiN2Mpy5EtZoDOmyKGQ%3D"')
+    request.setHeader('Authorization', '="SharedKey krystianmanczak.blob.core.windows.net:sharedkeyshouldbeusedhere"')
     request.setHeader('x-ms-version', '2022-11-02')
 
     request.write('\nanother line from electron')
