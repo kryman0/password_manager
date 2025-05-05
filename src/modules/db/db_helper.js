@@ -8,8 +8,6 @@ const { logging } = require(path.resolve('src/modules/logging/db_logging'))
 
 const { various } = require(path.resolve('src/modules/helpers/various'))
 
-// close db when app closes, etc.
-
 function closeDb(dbs) {
     for (let i = 0; i < dbs.length; i++) {
         let db = dbs[i]

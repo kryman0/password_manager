@@ -134,4 +134,8 @@ dist
 
 ## misc
 
+# sql
 sql/pm_db.sqlite
+
+# jetbrains
+.idea/
